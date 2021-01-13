@@ -9,7 +9,7 @@ import (
 
 func main() {
 	var (
-		a = app.NewWithID("number-place.AlbinoGeek.com.github")
+		a = app.NewWithID("com.github.albinogeek.number-place")
 		w = a.NewWindow("Number Place")
 	)
 
