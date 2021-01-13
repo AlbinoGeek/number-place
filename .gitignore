@@ -1,0 +1,7 @@
+# Build Artifacts
+_dist/archive
+_dist/checksums.sha512
+_dist/number-place*
+fyne-cross/bin/**/*
+fyne-cross/dist/**/*
+fyne-cross/tmp/**/*
