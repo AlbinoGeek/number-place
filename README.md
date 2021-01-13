@@ -24,10 +24,13 @@ Cells:
 - [X] Sodoku
   - [X] Standard Grid (9x9, 3x3 subgrids)
     - [X] Classic
+    - [ ] Quadratum latinum (uses roman numerals for values)
+    - [ ] Alphabetical (uses a key of letters for values)
   - [ ] Mini Grid (6x6, 3x2 subgrids)
   - [ ] Giant Grid (16x16, 4x4 subgrids)
 - [ ] Constrainted-Based Gridded Sodoku:
   - [ ] Standard Grid (9x9, 3x3 subgrids)
+    - [ ] "Killer"
     - [ ] Greater Than
     - [ ] XV
 
