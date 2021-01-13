@@ -15,6 +15,7 @@ Share puzzles simply by copying a string:
 ```
 
 Cells:
+
 - Click/Tap Toggle Select
 - Drag to Select Multiple
 - Unlimited Undo Levels
