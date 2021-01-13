@@ -45,14 +45,7 @@ func uiInit(w fyne.Window) {
 		widget.NewSeparator(),
 		fyne.NewContainerWithLayout(
 			layout.NewAdaptiveGridLayout(3),
-			widget.NewButtonWithIcon("", theme.CancelIcon(), func() {
-				for _, c := range b.cells {
-					if c.selected {
-						c.selected = false
-						c.SetCenter("")
-					}
-				}
-			}),
+			widget.NewButtonWithIcon("", theme.CancelIcon(), clearSelected(b)),
 			widget.NewButtonWithIcon("", theme.ContentUndoIcon(), b.undo),
 		),
 	)
@@ -71,16 +64,31 @@ func uiInit(w fyne.Window) {
 	w.CenterOnScreen()
 }
 
+func clearSelected(b *board) func() {
+	return func() {
+		b.mu.Lock()
+		for _, c := range b.cells {
+			if c.selected {
+				c.selected = false
+				c.SetCenter("")
+			}
+		}
+		b.mu.Unlock()
+	}
+}
+
 func setSelected(b *board, n int) func() {
 	return func() {
 		b.registerUndo()
 
+		b.mu.Lock()
 		for _, c := range b.cells {
 			if c.selected {
 				c.selected = false
 				c.SetCenter(strconv.Itoa(n))
 			}
 		}
+		b.mu.Unlock()
 
 		b.check()
 	}

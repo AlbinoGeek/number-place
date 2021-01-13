@@ -5,18 +5,28 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"fyne.io/fyne"
 	"fyne.io/fyne/layout"
 	"fyne.io/fyne/widget"
+	jsoniter "github.com/json-iterator/go"
+	"github.com/kataras/golog"
 )
 
-type board struct {
-	*fyne.Container
-	cells []*cell
+type state struct {
+	Data []byte
+	Name string
+	Time int64
+}
 
-	// history represents cell center strings, newest at the end
-	history [][]string
+type board struct {
+	*fyne.Container `json:"-"`
+
+	mu      sync.Mutex
+	cells   []*cell
+	history []*state
 
 	boxWidth  int
 	boxHeight int
@@ -37,11 +47,17 @@ func newBoard(boxWidth, boxHeight, boxesWide, boxesTall int) *board {
 }
 
 func (b *board) check() error {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
 	return nil
 }
 
 func (b *board) init() {
-	b.history = [][]string{}
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
+	b.history = make([]*state, 0)
 
 	var (
 		// TODO: support other cell arrangements, counts, in an elegant way
@@ -108,24 +124,34 @@ func (b *board) load(in string) error {
 		return fmt.Errorf("bad data has wrong cell count: expected %d, got %d", a, b)
 	}
 
+	b.mu.Lock()
 	for i, c := range b.cells {
 		if v := parts[4][i]; v != '-' {
 			c.SetGiven(string(v))
 		}
 	}
+	b.mu.Unlock()
 
 	b.registerUndo()
 	return b.check()
 }
 
 func (b *board) registerUndo() {
-	state := make([]string, len(b.cells))
+	b.mu.Lock()
+	defer b.mu.Unlock()
 
-	for i, c := range b.cells {
-		state[i] = c.center
+	data, err := jsoniter.Marshal(&b.cells)
+	if err != nil {
+		golog.Fatalf("unable to save state: %v", err)
 	}
 
-	b.history = append(b.history, state)
+	fmt.Println(string(data))
+
+	b.history = append(b.history, &state{
+		Data: data,
+		Name: "",
+		Time: time.Now().Unix(),
+	})
 }
 
 func (b *board) undo() {
@@ -133,11 +159,15 @@ func (b *board) undo() {
 		return
 	}
 
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
 	n := len(b.history) - 1
-	state := b.history[n]
+	s := b.history[n]
 	b.history = b.history[:n]
-	for i, c := range b.cells {
-		c.center = state[i]
+
+	jsoniter.Unmarshal(s.Data, &b.cells)
+	for _, c := range b.cells {
 		c.Refresh()
 	}
 }

@@ -17,14 +17,14 @@ var _ desktop.Mouseable = (*cell)(nil)
 var _ mobile.Touchable = (*cell)(nil)
 
 type cell struct {
-	widget.BaseWidget
+	widget.BaseWidget `json:"-"`
 
-	center string
-	given  string
+	ID     int
+	Center string
+	Given  string
 
-	id       int
-	hovered  bool
-	selected bool
+	hovered  bool `json:"-"`
+	selected bool `json:"-"`
 }
 
 func newCell(id int) *cell {
@@ -33,7 +33,7 @@ func newCell(id int) *cell {
 	// layout.NewAdaptiveGridLayout(3),
 	// )
 
-	c := &cell{id: id}
+	c := &cell{ID: id}
 	c.ExtendBaseWidget(c)
 
 	return c
@@ -43,7 +43,7 @@ func (c *cell) CreateRenderer() fyne.WidgetRenderer {
 	rend := &cellRenderer{
 		cell: c,
 		rect: canvas.NewRectangle(color.Transparent),
-		text: canvas.NewText(c.center, theme.TextColor()),
+		text: canvas.NewText(c.Center, theme.TextColor()),
 	}
 
 	rend.rect.StrokeWidth = 1
@@ -56,7 +56,7 @@ func (c *cell) CreateRenderer() fyne.WidgetRenderer {
 }
 
 func (c *cell) MouseIn(evt *desktop.MouseEvent) {
-	if c.given == "" {
+	if c.Given == "" {
 		c.hovered = true
 
 		if evt.Button == desktop.LeftMouseButton && downCell != c {
@@ -71,7 +71,7 @@ func (c *cell) MouseIn(evt *desktop.MouseEvent) {
 }
 
 func (c *cell) MouseOut() {
-	if c.given == "" {
+	if c.Given == "" {
 		c.hovered = false
 		c.Refresh()
 	}
@@ -115,19 +115,19 @@ func (c *cell) TouchCancel(*mobile.TouchEvent) {}
 // ---
 
 func (c *cell) Select() {
-	if c.given == "" && !c.selected {
+	if c.Given == "" && !c.selected {
 		c.selected = true
 		c.Refresh()
 	}
 }
 
 func (c *cell) SetGiven(n string) {
-	c.given = n
+	c.Given = n
 	c.Refresh()
 }
 
 func (c *cell) SetCenter(n string) {
-	c.center = n
+	c.Center = n
 	c.Refresh()
 }
 
@@ -160,11 +160,11 @@ func (r *cellRenderer) Objects() []fyne.CanvasObject {
 }
 
 func (r *cellRenderer) Refresh() {
-	if r.cell.given != "" {
+	if r.cell.Given != "" {
 		// cell is known to be correct and cannot be modified
 		r.rect.FillColor = theme.ShadowColor()
 		r.rect.StrokeColor = theme.HoverColor()
-		r.text.Text = r.cell.given
+		r.text.Text = r.cell.Given
 	} else {
 		// cell is unknown and can be selected and modified
 		if r.cell.hovered {
@@ -181,7 +181,7 @@ func (r *cellRenderer) Refresh() {
 			r.rect.StrokeColor = theme.ShadowColor()
 		}
 
-		r.text.Text = r.cell.center
+		r.text.Text = r.cell.Center
 	}
 
 	r.rect.Refresh()
