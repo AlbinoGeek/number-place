@@ -5,6 +5,8 @@ import (
 	"fyne.io/fyne/app"
 )
 
+//go:generate go run gen.go
+
 func main() {
 	var (
 		a = app.NewWithID("number-place.AlbinoGeek.com.github")
