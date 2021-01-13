@@ -29,8 +29,8 @@ If you know of a puzzle type not listed above, please [request it!](https://gith
 ## Building From Source
 
 1. Install Golang
-2. Clone the repository
-3. Run `make`
+1. Clone the repository
+1. Run `make`
 
 ```bash
 # Install Golang [apt / yum / dnf install golang]
