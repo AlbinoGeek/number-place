@@ -15,6 +15,9 @@ type board struct {
 	*fyne.Container
 	cells []*cell
 
+	// history represents cell center strings, newest at the end
+	history [][]string
+
 	boxWidth  int
 	boxHeight int
 	boxesWide int
@@ -38,6 +41,8 @@ func (b *board) check() error {
 }
 
 func (b *board) init() {
+	b.history = [][]string{}
+
 	var (
 		// TODO: support other cell arrangements, counts, in an elegant way
 		boxSize    = b.boxWidth * b.boxHeight
@@ -109,5 +114,30 @@ func (b *board) load(in string) error {
 		}
 	}
 
+	b.registerUndo()
 	return b.check()
+}
+
+func (b *board) registerUndo() {
+	state := make([]string, len(b.cells))
+
+	for i, c := range b.cells {
+		state[i] = c.center
+	}
+
+	b.history = append(b.history, state)
+}
+
+func (b *board) undo() {
+	if len(b.history) == 0 {
+		return
+	}
+
+	n := len(b.history) - 1
+	state := b.history[n]
+	b.history = b.history[:n]
+	for i, c := range b.cells {
+		c.center = state[i]
+		c.Refresh()
+	}
 }

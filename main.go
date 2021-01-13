@@ -43,6 +43,8 @@ func uiInit(w fyne.Window) {
 			controls...,
 		),
 		widget.NewSeparator(),
+		fyne.NewContainerWithLayout(
+			layout.NewAdaptiveGridLayout(3),
 			widget.NewButtonWithIcon("", theme.CancelIcon(), func() {
 				for _, c := range b.cells {
 					if c.selected {
@@ -51,6 +53,8 @@ func uiInit(w fyne.Window) {
 					}
 				}
 			}),
+			widget.NewButtonWithIcon("", theme.ContentUndoIcon(), b.undo),
+		),
 	)
 
 	w.SetContent(container.NewBorder(
