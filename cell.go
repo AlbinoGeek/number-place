@@ -28,6 +28,11 @@ type cell struct {
 }
 
 func newCell(id int) *cell {
+	// TODO: implement corner numbers
+	// c := fyne.NewContainerWithLayout(
+	// layout.NewAdaptiveGridLayout(3),
+	// )
+
 	c := &cell{id: id}
 	c.ExtendBaseWidget(c)
 
