@@ -74,8 +74,10 @@ func (b *board) checkSubgridRepeat() (err error) {
 		}
 
 		if items := checkDuplicates(grid); len(items) > 0 {
-			for _, c := range items {
-				c.SetMistake(true)
+			if HighlightMistakes {
+				for _, c := range items {
+					c.SetMistake(true)
+				}
 			}
 
 			err = fmt.Errorf("duplicates in subgroup")
@@ -115,8 +117,10 @@ func (b *board) checkColRepeat() (err error) {
 
 	for _, row := range data {
 		if items := checkDuplicates(row); len(items) > 0 {
-			for _, c := range items {
-				c.SetMistake(true)
+			if HighlightMistakes {
+				for _, c := range items {
+					c.SetMistake(true)
+				}
 			}
 
 			err = fmt.Errorf("duplicates in row")

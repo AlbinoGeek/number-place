@@ -13,6 +13,12 @@ import (
 
 //go:generate go run gen.go
 
+// TODO: These become configuration
+
+// HighlightMistakes will become a configuration variable representing whether
+// summary mistakes are checked for with every set.
+var HighlightMistakes = true
+
 var wikipedia = `3,3,3,3,53-6---98-7-195----------6-8--4--7---6-8-3-2---3--1--6-6----------419-8-28---5-79`
 
 func main() {
