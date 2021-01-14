@@ -45,6 +45,17 @@ func TestBoardUndo(t *testing.T) {
 	assert.EqualValues(t, cell.Center, old, "undo did not restore value")
 }
 
+func BenchmarkBoardLoad(b *testing.B) {
+	_ = test.NewApp()
+
+	board := newBoard(3, 3, 3, 3)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		board.load(wikipedia)
+	}
+}
+
 func BenchmarkBoardCheck(b *testing.B) {
 	_ = test.NewApp()
 
