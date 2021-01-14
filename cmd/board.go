@@ -166,8 +166,23 @@ func (b *board) init() {
 		// TODO: support other cell arrangements, counts, in an elegant way
 		boxSize    = b.boxWidth * b.boxHeight
 		numBoxes   = b.boxesWide * b.boxesTall
-		boxObjects = make([]fyne.CanvasObject, numBoxes)
+		boxObjects []fyne.CanvasObject
 	)
+
+	// optimization: reduce allocations by re-using previously-created fyne.Container
+	if b.Container != nil {
+		boxObjects = b.Container.Objects
+
+		if have := len(boxObjects); have > numBoxes || cap(boxObjects) >= numBoxes {
+			// len too high, or len too low, but space in capacity
+			boxObjects = boxObjects[:numBoxes]
+		} else if have < numBoxes {
+			// len too low, needs extend
+			boxObjects = append(boxObjects, make([]fyne.CanvasObject, numBoxes-have)...)
+		}
+	} else {
+		boxObjects = make([]fyne.CanvasObject, numBoxes)
+	}
 
 	b.cells = make([]*cell, boxSize*numBoxes)
 
@@ -181,16 +196,29 @@ func (b *board) init() {
 			n++
 		}
 
-		boxObjects[i] = widget.NewCard("", "", fyne.NewContainerWithLayout(
-			layout.NewAdaptiveGridLayout(b.boxWidth),
-			cells...,
-		))
+		if boxObjects[i] != nil {
+			// optimization: reduce allocations by re-using previously-created widget.Card
+			box := boxObjects[i].(*widget.Card).Content.(*fyne.Container)
+			box.Objects = cells
+			box.Refresh()
+		} else {
+			boxObjects[i] = widget.NewCard("", "", fyne.NewContainerWithLayout(
+				layout.NewAdaptiveGridLayout(b.boxWidth),
+				cells...,
+			))
+		}
 	}
 
-	b.Container = fyne.NewContainerWithLayout(
-		layout.NewAdaptiveGridLayout(b.boxesWide),
-		boxObjects...,
-	)
+	if b.Container != nil {
+		// optimization: reduce allocations by re-using previously created fyne.Container
+		b.Container.Objects = boxObjects
+		b.Container.Refresh()
+	} else {
+		b.Container = fyne.NewContainerWithLayout(
+			layout.NewAdaptiveGridLayout(b.boxesWide),
+			boxObjects...,
+		)
+	}
 }
 
 func (b *board) load(in string) error {
