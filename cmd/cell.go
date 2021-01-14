@@ -23,9 +23,9 @@ type cell struct {
 	Center string
 	Given  string
 
-	hovered  bool `json:"-"`
-	mistake  bool `json:"-"`
-	selected bool `json:"-"`
+	hovered  bool
+	mistake  bool
+	selected bool
 }
 
 func newCell(id int) *cell {
