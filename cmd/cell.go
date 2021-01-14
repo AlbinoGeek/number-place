@@ -24,6 +24,7 @@ type cell struct {
 	Given  string
 
 	hovered  bool `json:"-"`
+	mistake  bool `json:"-"`
 	selected bool `json:"-"`
 }
 
@@ -122,12 +123,19 @@ func (c *cell) Select() {
 }
 
 func (c *cell) SetGiven(n string) {
+	c.mistake = false
 	c.Given = n
 	c.Refresh()
 }
 
 func (c *cell) SetCenter(n string) {
+	c.mistake = false
 	c.Center = n
+	c.Refresh()
+}
+
+func (c *cell) SetMistake(b bool) {
+	c.mistake = b
 	c.Refresh()
 }
 
@@ -175,7 +183,9 @@ func (r *cellRenderer) Refresh() {
 			r.rect.FillColor = color.Transparent
 		}
 
-		if r.cell.selected {
+		if r.cell.mistake {
+			r.rect.StrokeColor = theme.PrimaryColorNamed(theme.ColorRed)
+		} else if r.cell.selected {
 			r.rect.StrokeColor = theme.FocusColor()
 		} else {
 			r.rect.StrokeColor = theme.ShadowColor()
