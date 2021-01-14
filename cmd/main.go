@@ -13,6 +13,8 @@ import (
 
 //go:generate go run gen.go
 
+var wikipedia = `3,3,3,3,53-6---98-7-195----------6-8--4--7---6-8-3-2---3--1--6-6----------419-8-28---5-79`
+
 func main() {
 	var (
 		a = app.NewWithID("com.github.albinogeek.number-place")
@@ -27,7 +29,7 @@ func main() {
 
 func uiInit(w fyne.Window) {
 	b := newBoard(3, 3, 3, 3)
-	b.load(`3,3,3,3,53-6---98-7-195----------6-8--4--7---6-8-3-2---3--1--6-6----------419-8-28---5-79`)
+	b.load(wikipedia)
 
 	controls := make([]fyne.CanvasObject, 0)
 
