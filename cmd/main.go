@@ -41,8 +41,8 @@ func uiInit(w fyne.Window) {
 
 	// TODO: Support other digit systems (such as HEX for sandwiche or Giant)
 	for i := 0; i < b.boxWidth*b.boxesWide; i++ {
-		n := 1 + i
-		controls = append(controls, widget.NewButton(strconv.Itoa(n), setSelected(b, n)))
+		v := strconv.Itoa(1 + i)
+		controls = append(controls, widget.NewButton(v, setSelected(b, v)))
 	}
 
 	controlArea := container.NewVBox(
@@ -74,18 +74,11 @@ func uiInit(w fyne.Window) {
 
 func clearSelected(b *board) func() {
 	return func() {
-		b.mu.Lock()
-		for _, c := range b.cells {
-			if c.selected {
-				c.selected = false
-				c.SetCenter("")
-			}
-		}
-		b.mu.Unlock()
+		setSelected(b, "")()
 	}
 }
 
-func setSelected(b *board, n int) func() {
+func setSelected(b *board, value string) func() {
 	return func() {
 		b.registerUndo()
 
@@ -93,7 +86,9 @@ func setSelected(b *board, n int) func() {
 		for _, c := range b.cells {
 			if c.selected {
 				c.selected = false
-				c.SetCenter(strconv.Itoa(n))
+				c.SetCenter(value)
+			} else {
+				c.SetMistake(false)
 			}
 		}
 		b.mu.Unlock()
