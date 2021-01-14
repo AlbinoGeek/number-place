@@ -51,11 +51,7 @@ func (b *board) check() error {
 	defer b.mu.Unlock()
 
 	// constraint : No value may be repeated within a subgrid
-	if err := b.checkSubgridRepeat(); err != nil {
-		return err
-	}
-
-	return nil
+	return b.checkSubgridRepeat()
 }
 
 func (b *board) checkSubgridRepeat() (err error) {
