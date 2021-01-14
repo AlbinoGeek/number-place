@@ -22,3 +22,21 @@ func TestBoardLoadCheck(t *testing.T) {
 	assert.Errorf(t, board.load(testGridRepeat), "loading repeats in subgrid should have failed")
 }
 
+func TestBoardUndo(t *testing.T) {
+	_ = test.NewApp()
+
+	board := newBoard(3, 3, 3, 3)
+
+	assert.NoError(t, board.load(wikipedia), "failed loading valid classic sodoku")
+
+	cell := board.cells[2]
+	old := cell.Center
+
+	cell.SetCenter("5")
+
+	assert.Errorf(t, board.check(), "checking repeats in subgrid should have failed")
+	assert.EqualValues(t, cell.Center, "5", "SetCenter failed to set expected value")
+
+	board.undo()
+	assert.EqualValues(t, cell.Center, old, "undo did not restore value")
+}
