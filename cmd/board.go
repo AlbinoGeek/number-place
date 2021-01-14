@@ -50,7 +50,6 @@ func (b *board) check() error {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
-	// constraint : No value may be repeated within a subgrid
 	if err := b.checkSubgridRepeat(); err != nil {
 		return err
 	}
@@ -58,6 +57,7 @@ func (b *board) check() error {
 	return b.checkColRepeat()
 }
 
+// checkSubgridRepeat checks the constraint : No value may be repeated within a subgrid
 func (b *board) checkSubgridRepeat() (err error) {
 	var (
 		cellsPerSG = b.boxHeight * b.boxWidth
@@ -87,6 +87,7 @@ func (b *board) checkSubgridRepeat() (err error) {
 	return err
 }
 
+// checkColRepeat checks the constraint : No value may be repeated within a column
 func (b *board) checkColRepeat() (err error) {
 	var (
 		cellsPerSG  = b.boxWidth * b.boxHeight
