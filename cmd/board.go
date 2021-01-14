@@ -50,7 +50,74 @@ func (b *board) check() error {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
+	// constraint : No value may be repeated within a subgrid
+	if err := b.checkSubgridRepeat(); err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func (b *board) checkSubgridRepeat() (err error) {
+	var (
+		cellsPerSG = b.boxHeight * b.boxWidth
+		grid       = make([]*cell, cellsPerSG)
+		value      = ""
+		offset     int
+	)
+
+	for sg := 0; sg < b.boxesTall*b.boxesWide; sg++ {
+		offset = cellsPerSG * sg
+
+		// per cell in subgrid
+		for i := 0; i < cellsPerSG; i++ {
+			grid[i] = b.cells[offset+i]
+
+			if value = grid[i].Given; value == "" {
+				value = grid[i].Center
+			}
+		}
+
+		if items := checkDuplicates(grid); len(items) > 0 {
+			for _, c := range items {
+				c.SetMistake(true)
+			}
+
+			err = fmt.Errorf("duplicates in subgroup")
+		}
+	}
+
+	return err
+}
+
+func checkDuplicates(data []*cell) []*cell {
+	var (
+		occur = make(map[string][]*cell)
+		value string
+	)
+
+	for _, c := range data {
+		if value = c.Given; value == "" {
+			if value = c.Center; value == "" {
+				continue
+			}
+		}
+
+		if _, exist := occur[value]; !exist {
+			occur[value] = []*cell{}
+		}
+
+		occur[value] = append(occur[value], c)
+	}
+
+	dupes := make([]*cell, 0)
+	for _, o := range occur {
+		if len(o) > 1 {
+			dupes = append(dupes, o...)
+		}
+	}
+
+	return dupes
 }
 
 func (b *board) init() {
@@ -145,8 +212,6 @@ func (b *board) registerUndo() {
 		golog.Fatalf("unable to save state: %v", err)
 	}
 
-	fmt.Println(string(data))
-
 	b.history = append(b.history, &state{
 		Data: data,
 		Name: "",
@@ -160,7 +225,6 @@ func (b *board) undo() {
 	}
 
 	b.mu.Lock()
-	defer b.mu.Unlock()
 
 	n := len(b.history) - 1
 	s := b.history[n]
@@ -168,6 +232,10 @@ func (b *board) undo() {
 
 	jsoniter.Unmarshal(s.Data, &b.cells)
 	for _, c := range b.cells {
+		c.mistake = false
 		c.Refresh()
 	}
+	b.mu.Unlock()
+
+	b.check()
 }
