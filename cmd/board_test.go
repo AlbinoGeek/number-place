@@ -40,3 +40,16 @@ func TestBoardUndo(t *testing.T) {
 	board.undo()
 	assert.EqualValues(t, cell.Center, old, "undo did not restore value")
 }
+
+func BenchmarkBoardCheckSubgrids(b *testing.B) {
+	_ = test.NewApp()
+
+	board := newBoard(3, 3, 3, 3)
+
+	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sodoku")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		board.checkSubgridRepeat()
+	}
+}
