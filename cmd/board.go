@@ -51,14 +51,17 @@ func (b *board) check() error {
 	defer b.mu.Unlock()
 
 	// constraint : No value may be repeated within a subgrid
-	return b.checkSubgridRepeat()
+	if err := b.checkSubgridRepeat(); err != nil {
+		return err
+	}
+
+	return b.checkColRepeat()
 }
 
 func (b *board) checkSubgridRepeat() (err error) {
 	var (
 		cellsPerSG = b.boxHeight * b.boxWidth
 		grid       = make([]*cell, cellsPerSG)
-		value      = ""
 		offset     int
 	)
 
@@ -68,10 +71,6 @@ func (b *board) checkSubgridRepeat() (err error) {
 		// per cell in subgrid
 		for i := 0; i < cellsPerSG; i++ {
 			grid[i] = b.cells[offset+i]
-
-			if value = grid[i].Given; value == "" {
-				value = grid[i].Center
-			}
 		}
 
 		if items := checkDuplicates(grid); len(items) > 0 {
@@ -80,6 +79,47 @@ func (b *board) checkSubgridRepeat() (err error) {
 			}
 
 			err = fmt.Errorf("duplicates in subgroup")
+		}
+	}
+
+	return err
+}
+
+func (b *board) checkColRepeat() (err error) {
+	var (
+		cellsPerSG  = b.boxWidth * b.boxHeight
+		cellsPerCol = b.boxHeight * b.boxesTall
+		cellsPerRow = b.boxWidth * b.boxesWide
+		data        = make([][]*cell, cellsPerCol)
+		offset      int
+	)
+
+	for col := 0; col < cellsPerRow; col++ {
+		data[col] = make([]*cell, cellsPerRow)
+	}
+
+	// for each subgrid in board
+	for sg := 0; sg < b.boxesTall*b.boxesWide; sg++ {
+		offset = cellsPerSG * sg
+
+		// for each cell in subgrid
+		for i := 0; i < cellsPerSG; i++ {
+			// column
+			col := i%b.boxWidth + (sg*b.boxWidth)%(b.boxWidth*b.boxesWide)
+			// row
+			row := (i / b.boxWidth) + (sg/b.boxesWide)*b.boxesTall
+
+			data[col][row] = b.cells[offset+i]
+		}
+	}
+
+	for _, row := range data {
+		if items := checkDuplicates(row); len(items) > 0 {
+			for _, c := range items {
+				c.SetMistake(true)
+			}
+
+			err = fmt.Errorf("duplicates in row")
 		}
 	}
 
