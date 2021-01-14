@@ -34,6 +34,8 @@ func TestBoardUndo(t *testing.T) {
 	cell := board.cells[2]
 	old := cell.Center
 
+	// It's our responsibility to save a history state if we're setting manually
+	board.registerUndo()
 	cell.SetCenter("5")
 
 	assert.Errorf(t, board.check(), "checking repeats in subgrid should have failed")
