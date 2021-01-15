@@ -96,3 +96,16 @@ func BenchmarkBoardCheckCols(b *testing.B) {
 		board.checkColRepeat(nil)
 	}
 }
+
+func BenchmarkBoardCheckRows(b *testing.B) {
+	_ = test.NewApp()
+
+	board := newBoard(3, 3, 3, 3)
+
+	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sodoku")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		board.checkRowRepeat(nil)
+	}
+}
