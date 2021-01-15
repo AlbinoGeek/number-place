@@ -6,6 +6,7 @@ import (
 	"fyne.io/fyne"
 	"fyne.io/fyne/app"
 	"fyne.io/fyne/container"
+	"fyne.io/fyne/dialog"
 	"fyne.io/fyne/layout"
 	"fyne.io/fyne/theme"
 	"fyne.io/fyne/widget"
@@ -55,6 +56,15 @@ func uiInit(w fyne.Window) {
 			layout.NewAdaptiveGridLayout(3),
 			widget.NewButtonWithIcon("", theme.CancelIcon(), clearSelected(b)),
 			widget.NewButtonWithIcon("", theme.ContentUndoIcon(), b.undo),
+			widget.NewButtonWithIcon("", theme.ConfirmIcon(), func() {
+				if err := b.check(); err != nil {
+					dialog.ShowError(err, w)
+					return
+				}
+
+				dialog.ShowInformation("Check Passed",
+					"I don't see any mistakes right now.\nIt's up to you to complete the puzzle.", w)
+			}),
 		),
 	)
 
