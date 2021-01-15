@@ -20,6 +20,10 @@ Cells:
 - Drag to Select Multiple
 - Unlimited Undo Levels
 
+Help:
+
+- Highlights Simple Mistakes
+
 ### Puzzles Supported
 
 - [X] Sodoku

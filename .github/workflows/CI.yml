@@ -48,8 +48,8 @@ jobs:
       run: go vet -tags ci ./...
     
     - name: goimports
-      run: test -z $(goimports -e -d . | tee /dev/stderr)
-    
+      run: bash -c "2>&1 goimports -e -d ."
+ 
     - name: gocyclo
       run: gocyclo -over 50 .
     
