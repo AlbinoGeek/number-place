@@ -100,7 +100,7 @@ func (b *board) checkSubgridRepeat(duplicates checkerCallback) (err error) {
 		}
 
 		if items := checkDuplicates(grid); len(items) > 0 {
-			err = fmt.Errorf("duplicates in subgroup")
+			err = fmt.Errorf("subgrid %d contains duplicate values", 1+sg)
 			if duplicates != nil {
 				duplicates(items)
 			}
@@ -139,9 +139,9 @@ func (b *board) checkColRepeat(duplicates checkerCallback) (err error) {
 		}
 	}
 
-	for _, row := range data {
-		if items := checkDuplicates(row); len(items) > 0 {
-			err = fmt.Errorf("duplicates in col")
+	for i, col := range data {
+		if items := checkDuplicates(col); len(items) > 0 {
+			err = fmt.Errorf("column %d contains duplicate values", 1+i)
 			if duplicates != nil {
 				duplicates(items)
 			}
@@ -180,9 +180,9 @@ func (b *board) checkRowRepeat(duplicates checkerCallback) (err error) {
 		}
 	}
 
-	for _, col := range data {
-		if items := checkDuplicates(col); len(items) > 0 {
-			err = fmt.Errorf("duplicates in row")
+	for i, row := range data {
+		if items := checkDuplicates(row); len(items) > 0 {
+			err = fmt.Errorf("row %d contains duplicate values", 1+i)
 			if duplicates != nil {
 				duplicates(items)
 			}
