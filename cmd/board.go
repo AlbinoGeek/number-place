@@ -65,14 +65,19 @@ func (b *board) check() error {
 		}
 	}
 
+	errors := make([]error, 0)
 	for _, f := range []checker{
 		b.checkSubgridRepeat,
 		b.checkColRepeat,
-		// b.checkRowRepeat,
+		b.checkRowRepeat,
 	} {
 		if err := f(cb); err != nil {
-			return err
+			errors = append(errors, err)
 		}
+	}
+
+	if len(errors) > 0 {
+		return errors[0]
 	}
 
 	return nil
@@ -136,6 +141,47 @@ func (b *board) checkColRepeat(duplicates checkerCallback) (err error) {
 
 	for _, row := range data {
 		if items := checkDuplicates(row); len(items) > 0 {
+			err = fmt.Errorf("duplicates in col")
+			if duplicates != nil {
+				duplicates(items)
+			}
+		}
+	}
+
+	return err
+}
+
+// checkRowRepeat checks the constraint : No value may be repeated within a row
+func (b *board) checkRowRepeat(duplicates checkerCallback) (err error) {
+	var (
+		cellsPerSG  = b.boxWidth * b.boxHeight
+		cellsPerCol = b.boxHeight * b.boxesTall
+		cellsPerRow = b.boxWidth * b.boxesWide
+		data        = make([][]*cell, cellsPerRow)
+		offset      int
+	)
+
+	for row := 0; row < cellsPerRow; row++ {
+		data[row] = make([]*cell, cellsPerCol)
+	}
+
+	// for each subgrid in board
+	for sg := 0; sg < b.boxesTall*b.boxesWide; sg++ {
+		offset = cellsPerSG * sg
+
+		// for each cell in subgrid
+		for i := 0; i < cellsPerSG; i++ {
+			// column
+			col := i%b.boxWidth + (sg*b.boxWidth)%(b.boxWidth*b.boxesWide)
+			// row
+			row := (i / b.boxWidth) + (sg/b.boxesWide)*b.boxesTall
+
+			data[row][col] = b.cells[offset+i]
+		}
+	}
+
+	for _, col := range data {
+		if items := checkDuplicates(col); len(items) > 0 {
 			err = fmt.Errorf("duplicates in row")
 			if duplicates != nil {
 				duplicates(items)
