@@ -46,19 +46,40 @@ func newBoard(boxWidth, boxHeight, boxesWide, boxesTall int) *board {
 	return b
 }
 
+// ! BADLY NAMED
+type checkerCallback func(dupes []*cell)
+
+// ! BADLY NAMED
+type checker func(duplicates checkerCallback) error
+
 func (b *board) check() error {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
-	if err := b.checkSubgridRepeat(); err != nil {
-		return err
+	var cb checkerCallback
+	if HighlightMistakes {
+		cb = func(dupes []*cell) {
+			for _, c := range dupes {
+				c.SetMistake(true)
+			}
+		}
 	}
 
-	return b.checkColRepeat()
+	for _, f := range []checker{
+		b.checkSubgridRepeat,
+		b.checkColRepeat,
+		// b.checkRowRepeat,
+	} {
+		if err := f(cb); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // checkSubgridRepeat checks the constraint : No value may be repeated within a subgrid
-func (b *board) checkSubgridRepeat() (err error) {
+func (b *board) checkSubgridRepeat(duplicates checkerCallback) (err error) {
 	var (
 		cellsPerSG = b.boxHeight * b.boxWidth
 		grid       = make([]*cell, cellsPerSG)
@@ -74,13 +95,10 @@ func (b *board) checkSubgridRepeat() (err error) {
 		}
 
 		if items := checkDuplicates(grid); len(items) > 0 {
-			if HighlightMistakes {
-				for _, c := range items {
-					c.SetMistake(true)
-				}
-			}
-
 			err = fmt.Errorf("duplicates in subgroup")
+			if duplicates != nil {
+				duplicates(items)
+			}
 		}
 	}
 
@@ -88,7 +106,7 @@ func (b *board) checkSubgridRepeat() (err error) {
 }
 
 // checkColRepeat checks the constraint : No value may be repeated within a column
-func (b *board) checkColRepeat() (err error) {
+func (b *board) checkColRepeat(duplicates checkerCallback) (err error) {
 	var (
 		cellsPerSG  = b.boxWidth * b.boxHeight
 		cellsPerCol = b.boxHeight * b.boxesTall
@@ -118,13 +136,10 @@ func (b *board) checkColRepeat() (err error) {
 
 	for _, row := range data {
 		if items := checkDuplicates(row); len(items) > 0 {
-			if HighlightMistakes {
-				for _, c := range items {
-					c.SetMistake(true)
-				}
-			}
-
 			err = fmt.Errorf("duplicates in row")
+			if duplicates != nil {
+				duplicates(items)
+			}
 		}
 	}
 

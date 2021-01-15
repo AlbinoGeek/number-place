@@ -78,7 +78,7 @@ func BenchmarkBoardCheckSubgrids(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		board.checkSubgridRepeat()
+		board.checkSubgridRepeat(nil)
 	}
 }
 
@@ -91,6 +91,6 @@ func BenchmarkBoardCheckCols(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		board.checkColRepeat()
+		board.checkColRepeat(nil)
 	}
 }
