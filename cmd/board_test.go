@@ -12,6 +12,7 @@ import (
 var (
 	testGridRepeat = `3,3,3,3,55-6---98-7-195----------6-8--4--7---6-8-3-2---3--1--6-6----------419-8-28---5-79`
 	testColRepeat  = `3,3,3,3,53-6---98-7-195----------6-5--4--7---6-8-3-2---3--1--6-6----------419-8-28---5-79`
+	testRowRepeat  = `3,3,3,3,53-6---9857-19-----------6-8--4--7---6-8-3-2---3--1--6-6----------419-8-28---5-79`
 )
 
 func TestBoardLoadCheck(t *testing.T) {
@@ -22,6 +23,7 @@ func TestBoardLoadCheck(t *testing.T) {
 	assert.NoError(t, board.load(wikipedia), "failed loading valid classic sodoku")
 	assert.Errorf(t, board.load(testGridRepeat), "loading repeats in subgrid should have failed")
 	assert.Errorf(t, board.load(testColRepeat), "loading repeats in col should have failed")
+	assert.Errorf(t, board.load(testRowRepeat), "loading repeats in row should have failed")
 }
 
 func TestBoardUndo(t *testing.T) {
