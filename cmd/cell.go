@@ -88,9 +88,7 @@ func (c *cell) MouseDown(*desktop.MouseEvent) {
 	downCell = c
 	wasSelected = c.selected
 
-	if !c.selected {
-		c.Select()
-	}
+	c.Select()
 }
 
 func (c *cell) MouseUp(*desktop.MouseEvent) {
