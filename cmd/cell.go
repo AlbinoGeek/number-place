@@ -88,9 +88,7 @@ func (c *cell) MouseDown(*desktop.MouseEvent) {
 	downCell = c
 	wasSelected = c.selected
 
-	if !c.selected {
-		c.Select()
-	}
+	c.Select()
 }
 
 func (c *cell) MouseUp(*desktop.MouseEvent) {
@@ -135,8 +133,10 @@ func (c *cell) SetCenter(n string) {
 }
 
 func (c *cell) SetMistake(b bool) {
-	c.mistake = b
-	c.Refresh()
+	if c.mistake != b {
+		c.mistake = b
+		c.Refresh()
+	}
 }
 
 type cellRenderer struct {
