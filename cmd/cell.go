@@ -135,8 +135,10 @@ func (c *cell) SetCenter(n string) {
 }
 
 func (c *cell) SetMistake(b bool) {
-	c.mistake = b
-	c.Refresh()
+	if c.mistake != b {
+		c.mistake = b
+		c.Refresh()
+	}
 }
 
 type cellRenderer struct {
