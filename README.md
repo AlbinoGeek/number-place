@@ -25,6 +25,13 @@ Help:
 
 - Highlights Simple Mistakes
 
+### Keyboard Controls
+
+With Cells Selected:
+
+- Use the alpha keys or numpad to set the center value
+- Use the `del`ete or `backspace` keys to clear all values
+
 ### Puzzles Supported
 
 - [X] Sodoku
