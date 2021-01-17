@@ -52,6 +52,7 @@ func BenchmarkBoardLoad(b *testing.B) {
 
 	board := newBoard(3, 3, 3, 3)
 
+	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		board.load(wikipedia)
@@ -65,6 +66,7 @@ func BenchmarkBoardCheck(b *testing.B) {
 
 	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sodoku")
 
+	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		board.check()
@@ -78,6 +80,7 @@ func BenchmarkBoardCheckSubgrids(b *testing.B) {
 
 	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sodoku")
 
+	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		board.checkSubgridRepeat(nil)
@@ -91,6 +94,7 @@ func BenchmarkBoardCheckCols(b *testing.B) {
 
 	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sodoku")
 
+	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		board.checkColRepeat(nil)
@@ -104,6 +108,7 @@ func BenchmarkBoardCheckRows(b *testing.B) {
 
 	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sodoku")
 
+	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		board.checkRowRepeat(nil)
