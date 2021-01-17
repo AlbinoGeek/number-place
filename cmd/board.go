@@ -32,14 +32,20 @@ type board struct {
 	boxHeight int
 	boxesWide int
 	boxesTall int
+
+	// optimization: pre-calculated fields (used often)
+	cellsPerBox int
+	cellsPerRow int
 }
 
 func newBoard(boxWidth, boxHeight, boxesWide, boxesTall int) *board {
 	var b = &board{
-		boxWidth:  boxWidth,
-		boxHeight: boxHeight,
-		boxesWide: boxesWide,
-		boxesTall: boxesTall,
+		boxWidth:    boxWidth,
+		boxHeight:   boxHeight,
+		boxesWide:   boxesWide,
+		boxesTall:   boxesTall,
+		cellsPerBox: boxWidth * boxHeight,
+		cellsPerRow: boxWidth * boxesWide,
 	}
 
 	b.init()
@@ -86,16 +92,15 @@ func (b *board) check() error {
 // checkSubgridRepeat checks the constraint : No value may be repeated within a subgrid
 func (b *board) checkSubgridRepeat(duplicates checkerCallback) (err error) {
 	var (
-		cellsPerSG = b.boxHeight * b.boxWidth
-		grid       = make([]*cell, cellsPerSG)
-		offset     int
+		grid   = make([]*cell, b.cellsPerBox)
+		offset int
 	)
 
 	for sg := 0; sg < b.boxesTall*b.boxesWide; sg++ {
-		offset = cellsPerSG * sg
+		offset = b.cellsPerBox * sg
 
 		// per cell in subgrid
-		for i := 0; i < cellsPerSG; i++ {
+		for i := 0; i < b.cellsPerBox; i++ {
 			grid[i] = b.cells[offset+i]
 		}
 
@@ -113,23 +118,21 @@ func (b *board) checkSubgridRepeat(duplicates checkerCallback) (err error) {
 // checkColRepeat checks the constraint : No value may be repeated within a column
 func (b *board) checkColRepeat(duplicates checkerCallback) (err error) {
 	var (
-		cellsPerSG  = b.boxWidth * b.boxHeight
 		cellsPerCol = b.boxHeight * b.boxesTall
-		cellsPerRow = b.boxWidth * b.boxesWide
 		data        = make([][]*cell, cellsPerCol)
 		offset      int
 	)
 
-	for col := 0; col < cellsPerRow; col++ {
-		data[col] = make([]*cell, cellsPerRow)
+	for col := 0; col < b.cellsPerRow; col++ {
+		data[col] = make([]*cell, b.cellsPerRow)
 	}
 
 	// for each subgrid in board
 	for sg := 0; sg < b.boxesTall*b.boxesWide; sg++ {
-		offset = cellsPerSG * sg
+		offset = b.cellsPerBox * sg
 
 		// for each cell in subgrid
-		for i := 0; i < cellsPerSG; i++ {
+		for i := 0; i < b.cellsPerBox; i++ {
 			// column
 			col := i%b.boxWidth + (sg*b.boxWidth)%(b.boxWidth*b.boxesWide)
 			// row
@@ -154,37 +157,29 @@ func (b *board) checkColRepeat(duplicates checkerCallback) (err error) {
 // checkRowRepeat checks the constraint : No value may be repeated within a row
 func (b *board) checkRowRepeat(duplicates checkerCallback) (err error) {
 	var (
-		cellsPerSG  = b.boxWidth * b.boxHeight
-		cellsPerCol = b.boxHeight * b.boxesTall
-		cellsPerRow = b.boxWidth * b.boxesWide
-		data        = make([][]*cell, cellsPerRow)
-		offset      int
+		cellIDs = make([]int, b.cellsPerRow)
+
+		bx, by, i, j, row, rowNum, offset int
 	)
 
-	for row := 0; row < cellsPerRow; row++ {
-		data[row] = make([]*cell, cellsPerCol)
-	}
+	for by, rowNum = 0, 0; by < b.boxesTall; by++ {
+		for row = 0; row < b.boxHeight; row++ {
+			i = 0
+			for bx = 0; bx < b.boxesWide; bx++ {
+				offset = by*b.cellsPerBox*b.boxesWide + bx*b.cellsPerBox + row*b.boxWidth
 
-	// for each subgrid in board
-	for sg := 0; sg < b.boxesTall*b.boxesWide; sg++ {
-		offset = cellsPerSG * sg
+				for j = 0; j < b.boxWidth; j++ {
+					cellIDs[i] = offset + j
+					i++
+				}
+			}
 
-		// for each cell in subgrid
-		for i := 0; i < cellsPerSG; i++ {
-			// column
-			col := i%b.boxWidth + (sg*b.boxWidth)%(b.boxWidth*b.boxesWide)
-			// row
-			row := (i / b.boxWidth) + (sg/b.boxesWide)*b.boxesTall
-
-			data[row][col] = b.cells[offset+i]
-		}
-	}
-
-	for i, row := range data {
-		if items := checkDuplicates(row); len(items) > 0 {
-			err = fmt.Errorf("row %d contains duplicate values", 1+i)
-			if duplicates != nil {
-				duplicates(items)
+			rowNum++
+			if items := checkDuplicateIDs(b, cellIDs); len(items) > 0 {
+				err = fmt.Errorf("row %d contains duplicate values", rowNum)
+				if duplicates != nil {
+					duplicates(items)
+				}
 			}
 		}
 	}
@@ -222,6 +217,38 @@ func checkDuplicates(data []*cell) []*cell {
 	return dupes
 }
 
+func checkDuplicateIDs(b *board, ids []int) []*cell {
+	var (
+		occur = make(map[string][]int)
+		value string
+	)
+
+	for _, c := range ids {
+		if value = b.cells[c].Given; value == "" {
+			if value = b.cells[c].Center; value == "" {
+				continue
+			}
+		}
+
+		if _, exist := occur[value]; !exist {
+			occur[value] = []int{}
+		}
+
+		occur[value] = append(occur[value], c)
+	}
+
+	dupes := make([]*cell, 0)
+	for _, o := range occur {
+		if len(o) > 1 {
+			for _, c := range o {
+				dupes = append(dupes, b.cells[c])
+			}
+		}
+	}
+
+	return dupes
+}
+
 func (b *board) init() {
 	b.mu.Lock()
 	defer b.mu.Unlock()
@@ -230,7 +257,6 @@ func (b *board) init() {
 
 	var (
 		// TODO: support other cell arrangements, counts, in an elegant way
-		boxSize    = b.boxWidth * b.boxHeight
 		numBoxes   = b.boxesWide * b.boxesTall
 		boxObjects []fyne.CanvasObject
 	)
@@ -250,13 +276,13 @@ func (b *board) init() {
 		boxObjects = make([]fyne.CanvasObject, numBoxes)
 	}
 
-	b.cells = make([]*cell, boxSize*numBoxes)
+	b.cells = make([]*cell, b.cellsPerBox*numBoxes)
 
 	n := 0
 	for i := 0; i < numBoxes; i++ {
-		cells := make([]fyne.CanvasObject, boxSize)
+		cells := make([]fyne.CanvasObject, b.cellsPerBox)
 
-		for j := 0; j < boxSize; j++ {
+		for j := 0; j < b.cellsPerBox; j++ {
 			b.cells[n] = newCell(n)
 			cells[j] = b.cells[n]
 			n++
