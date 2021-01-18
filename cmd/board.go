@@ -125,13 +125,11 @@ func (b *board) checkColRepeat(duplicates checkerCallback) (err error) {
 		bx, by, i, j, col, colNum, offset int
 	)
 
-	// fmt.Println("-")
 	for bx, colNum = 0, 0; bx < b.boxesWide; bx++ {
 		for col = 0; col < b.boxWidth; col++ {
 			i = 0
 			for by = 0; by < b.boxesTall; by++ {
 				offset = by * b.cellsPerBox * b.boxesWide //+ bx*b.cellsPerBox + col*b.boxWidth
-				// fmt.Println("offset", offset)
 
 				for j = 0; j < b.boxHeight; j++ {
 					cellIDs[i] = offset + j*b.cellsPerRow
