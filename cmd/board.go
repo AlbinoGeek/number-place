@@ -35,6 +35,7 @@ type board struct {
 
 	// optimization: pre-calculated fields (used often)
 	cellsPerBox int
+	cellsPerCol int
 	cellsPerRow int
 }
 
@@ -45,6 +46,7 @@ func newBoard(boxWidth, boxHeight, boxesWide, boxesTall int) *board {
 		boxesWide:   boxesWide,
 		boxesTall:   boxesTall,
 		cellsPerBox: boxWidth * boxHeight,
+		cellsPerCol: boxHeight * boxesTall,
 		cellsPerRow: boxWidth * boxesWide,
 	}
 
@@ -118,35 +120,31 @@ func (b *board) checkSubgridRepeat(duplicates checkerCallback) (err error) {
 // checkColRepeat checks the constraint : No value may be repeated within a column
 func (b *board) checkColRepeat(duplicates checkerCallback) (err error) {
 	var (
-		cellsPerCol = b.boxHeight * b.boxesTall
-		data        = make([][]*cell, cellsPerCol)
-		offset      int
+		cellIDs = make([]int, b.cellsPerCol)
+
+		bx, by, i, j, col, colNum, offset int
 	)
 
-	for col := 0; col < b.cellsPerRow; col++ {
-		data[col] = make([]*cell, b.cellsPerRow)
-	}
+	// fmt.Println("-")
+	for bx, colNum = 0, 0; bx < b.boxesWide; bx++ {
+		for col = 0; col < b.boxWidth; col++ {
+			i = 0
+			for by = 0; by < b.boxesTall; by++ {
+				offset = by * b.cellsPerBox * b.boxesWide //+ bx*b.cellsPerBox + col*b.boxWidth
+				// fmt.Println("offset", offset)
 
-	// for each subgrid in board
-	for sg := 0; sg < b.boxesTall*b.boxesWide; sg++ {
-		offset = b.cellsPerBox * sg
+				for j = 0; j < b.boxHeight; j++ {
+					cellIDs[i] = offset + j*b.cellsPerRow
+					i++
+				}
+			}
 
-		// for each cell in subgrid
-		for i := 0; i < b.cellsPerBox; i++ {
-			// column
-			col := i%b.boxWidth + (sg*b.boxWidth)%(b.boxWidth*b.boxesWide)
-			// row
-			row := (i / b.boxWidth) + (sg/b.boxesWide)*b.boxesTall
-
-			data[col][row] = b.cells[offset+i]
-		}
-	}
-
-	for i, col := range data {
-		if items := checkDuplicates(col); len(items) > 0 {
-			err = fmt.Errorf("column %d contains duplicate values", 1+i)
-			if duplicates != nil {
-				duplicates(items)
+			colNum++
+			if items := checkDuplicateIDs(b, cellIDs); len(items) > 0 {
+				err = fmt.Errorf("column %d contains duplicate values", colNum)
+				if duplicates != nil {
+					duplicates(items)
+				}
 			}
 		}
 	}
