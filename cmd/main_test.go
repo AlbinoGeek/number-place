@@ -17,7 +17,7 @@ func TestUICells(t *testing.T) {
 		board = newBoard(3, 3, 3, 3)
 	)
 
-	assert.NoError(t, board.load(wikipedia), "failed loading valid classic sodoku")
+	assert.NoError(t, board.load(wikipedia), "failed loading valid classic sudoku")
 
 	uiInit(board, w)
 

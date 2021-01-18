@@ -20,7 +20,7 @@ func TestBoardLoadCheck(t *testing.T) {
 
 	board := newBoard(3, 3, 3, 3)
 
-	assert.NoError(t, board.load(wikipedia), "failed loading valid classic sodoku")
+	assert.NoError(t, board.load(wikipedia), "failed loading valid classic sudoku")
 	assert.Errorf(t, board.load(testBoxRepeat), "loading repeats in boxes should have failed")
 	assert.Errorf(t, board.load(testColRepeat), "loading repeats in col should have failed")
 	assert.Errorf(t, board.load(testRowRepeat), "loading repeats in row should have failed")
@@ -31,7 +31,7 @@ func TestBoardUndo(t *testing.T) {
 
 	board := newBoard(3, 3, 3, 3)
 
-	assert.NoError(t, board.load(wikipedia), "failed loading valid classic sodoku")
+	assert.NoError(t, board.load(wikipedia), "failed loading valid classic sudoku")
 
 	cell := board.cells[2]
 	old := cell.Center
@@ -52,7 +52,7 @@ func BenchmarkBoardCheckBoxes(b *testing.B) {
 
 	board := newBoard(3, 3, 3, 3)
 
-	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sodoku")
+	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sudoku")
 
 	cb := func(cells []*cell) {
 		assert.Equal(b, len(cells), 0)
@@ -100,7 +100,7 @@ func BenchmarkBoardCheckCols(b *testing.B) {
 
 	board := newBoard(3, 3, 3, 3)
 
-	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sodoku")
+	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sudoku")
 
 	cb := func(cells []*cell) {
 		assert.Equal(b, len(cells), 0)
@@ -118,7 +118,7 @@ func BenchmarkBoardCheckRows(b *testing.B) {
 
 	board := newBoard(3, 3, 3, 3)
 
-	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sodoku")
+	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sudoku")
 
 	cb := func(cells []*cell) {
 		assert.Equal(b, len(cells), 0)
@@ -136,7 +136,7 @@ func BenchmarkBoardCheck(b *testing.B) {
 
 	board := newBoard(3, 3, 3, 3)
 
-	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sodoku")
+	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sudoku")
 
 	b.ReportAllocs()
 	b.ResetTimer()
