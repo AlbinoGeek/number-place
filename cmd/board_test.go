@@ -65,6 +65,37 @@ func BenchmarkBoardCheckSubgrids(b *testing.B) {
 	}
 }
 
+func TestBoardCheckSubgridsExhaustive(t *testing.T) {
+	_ = test.NewApp()
+
+	board := newBoard(3, 3, 3, 3)
+
+	// Subgrids:
+	var offset int
+	var ic, jc *cell
+	for box := 0; box < board.boxesWide*board.boxesTall; box++ {
+		offset = box * board.cellsPerBox
+
+		// ! should do half as many comparisons, but I need to test which ones
+		for i := 0; i < board.cellsPerBox; i++ {
+			for j := 0; j < board.cellsPerBox; j++ {
+				if i == j {
+					continue
+				}
+
+				ic = board.cells[offset+i]
+				jc = board.cells[offset+j]
+				ic.SetCenter("5")
+				jc.SetCenter("5")
+				assert.Error(t, board.check(), "failed check for duplicate (%d, %d) in box %d", i, j, box)
+
+				ic.SetCenter("")
+				jc.SetCenter("")
+				assert.NoError(t, board.check())
+			}
+		}
+	}
+}
 func BenchmarkBoardCheckCols(b *testing.B) {
 	_ = test.NewApp()
 
