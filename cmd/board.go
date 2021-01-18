@@ -99,20 +99,19 @@ func (b *board) setMistakes(v bool) func([]*cell) {
 // checkBoxRepeat checks the constraint : No value may be repeated within a box
 func (b *board) checkBoxRepeat(duplicates checkerCallback) (err error) {
 	var (
-		grid   = make([]*cell, b.cellsPerBox)
-		offset int
+		cellIDs = make([]int, b.cellsPerCol)
+		offset  int
 	)
 
-	for sg := 0; sg < b.boxesTall*b.boxesWide; sg++ {
-		offset = b.cellsPerBox * sg
+	for box := 0; box < b.boxesTall*b.boxesWide; box++ {
+		offset = b.cellsPerBox * box
 
-		// per cell in box
 		for i := 0; i < b.cellsPerBox; i++ {
-			grid[i] = b.cells[offset+i]
+			cellIDs[i] = offset + i
 		}
 
-		if items := checkDuplicates(grid); len(items) > 0 {
-			err = fmt.Errorf("box %d contains duplicate values", 1+sg)
+		if items := checkDuplicateIDs(b, cellIDs); len(items) > 0 {
+			err = fmt.Errorf("box %d contains duplicate values", 1+box)
 			if duplicates != nil {
 				duplicates(items)
 			}
@@ -186,36 +185,6 @@ func (b *board) checkRowRepeat(duplicates checkerCallback) (err error) {
 	}
 
 	return err
-}
-
-func checkDuplicates(data []*cell) []*cell {
-	var (
-		occur = make(map[string][]*cell)
-		value string
-	)
-
-	for _, c := range data {
-		if value = c.Given; value == "" {
-			if value = c.Center; value == "" {
-				continue
-			}
-		}
-
-		if _, exist := occur[value]; !exist {
-			occur[value] = []*cell{}
-		}
-
-		occur[value] = append(occur[value], c)
-	}
-
-	dupes := make([]*cell, 0)
-	for _, o := range occur {
-		if len(o) > 1 {
-			dupes = append(dupes, o...)
-		}
-	}
-
-	return dupes
 }
 
 func checkDuplicateIDs(b *board, ids []int) []*cell {
