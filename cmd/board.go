@@ -62,15 +62,10 @@ type checker func(duplicates checkerCallback) error
 
 func (b *board) check() error {
 	b.mu.Lock()
-	defer b.mu.Unlock()
 
 	var cb checkerCallback
 	if HighlightMistakes {
-		cb = func(dupes []*cell) {
-			for _, c := range dupes {
-				c.SetMistake(true)
-			}
-		}
+		cb = b.setMistakes(true)
 	}
 
 	errors := make([]error, 0)
@@ -84,11 +79,21 @@ func (b *board) check() error {
 		}
 	}
 
+	b.mu.Unlock()
+
 	if len(errors) > 0 {
 		return errors[0]
 	}
 
 	return nil
+}
+
+func (b *board) setMistakes(v bool) func([]*cell) {
+	return func(cells []*cell) {
+		for _, c := range cells {
+			c.SetMistake(v)
+		}
+	}
 }
 
 // checkBoxRepeat checks the constraint : No value may be repeated within a box
@@ -383,10 +388,7 @@ func (b *board) undo() {
 	b.history = b.history[:n]
 
 	jsoniter.Unmarshal(s.Data, &b.cells)
-	for _, c := range b.cells {
-		c.mistake = false
-		c.Refresh()
-	}
+	b.setMistakes(false)(b.cells)
 	b.mu.Unlock()
 
 	b.check()
