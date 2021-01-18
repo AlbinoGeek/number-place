@@ -75,7 +75,7 @@ func (b *board) check() error {
 
 	errors := make([]error, 0)
 	for _, f := range []checker{
-		b.checkSubgridRepeat,
+		b.checkBoxRepeat,
 		b.checkColRepeat,
 		b.checkRowRepeat,
 	} {
@@ -91,8 +91,8 @@ func (b *board) check() error {
 	return nil
 }
 
-// checkSubgridRepeat checks the constraint : No value may be repeated within a subgrid
-func (b *board) checkSubgridRepeat(duplicates checkerCallback) (err error) {
+// checkBoxRepeat checks the constraint : No value may be repeated within a box
+func (b *board) checkBoxRepeat(duplicates checkerCallback) (err error) {
 	var (
 		grid   = make([]*cell, b.cellsPerBox)
 		offset int
@@ -101,13 +101,13 @@ func (b *board) checkSubgridRepeat(duplicates checkerCallback) (err error) {
 	for sg := 0; sg < b.boxesTall*b.boxesWide; sg++ {
 		offset = b.cellsPerBox * sg
 
-		// per cell in subgrid
+		// per cell in box
 		for i := 0; i < b.cellsPerBox; i++ {
 			grid[i] = b.cells[offset+i]
 		}
 
 		if items := checkDuplicates(grid); len(items) > 0 {
-			err = fmt.Errorf("subgrid %d contains duplicate values", 1+sg)
+			err = fmt.Errorf("box %d contains duplicate values", 1+sg)
 			if duplicates != nil {
 				duplicates(items)
 			}
