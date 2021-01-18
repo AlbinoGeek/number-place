@@ -28,16 +28,16 @@ func main() {
 		w = a.NewWindow("Number Place")
 	)
 
-	uiInit(w)
+	b := newBoard(3, 3, 3, 3)
+	b.load(wikipedia)
+
+	uiInit(b, w)
 
 	w.Show()
 	a.Run()
 }
 
-func uiInit(w fyne.Window) {
-	b := newBoard(3, 3, 3, 3)
-	b.load(wikipedia)
-
+func uiInit(b *board, w fyne.Window) {
 	controls := make([]fyne.CanvasObject, 0)
 
 	values := make(map[string]bool)
