@@ -25,17 +25,24 @@ Help:
 
 - Highlights Simple Mistakes
 
+### Keyboard Controls
+
+With Cells Selected:
+
+- Use the alpha keys or numpad to set the center value
+- Use the `del`ete or `backspace` keys to clear all values
+
 ### Puzzles Supported
 
 - [X] Sodoku
-  - [X] Standard Grid (9x9, 3x3 subgrids)
+  - [X] Standard Grid (9x9, 3x3 boxes)
     - [X] Classic
     - [ ] Quadratum latinum (uses roman numerals for values)
     - [ ] Alphabetical (uses a key of letters for values)
-  - [ ] Mini Grid (6x6, 3x2 subgrids)
-  - [ ] Giant Grid (16x16, 4x4 subgrids)
+  - [ ] Mini Grid (6x6, 3x2 boxes)
+  - [ ] Giant Grid (16x16, 4x4 boxes)
 - [ ] Constrainted-Based Gridded Sodoku:
-  - [ ] Standard Grid (9x9, 3x3 subgrids)
+  - [ ] Standard Grid (9x9, 3x3 boxes)
     - [ ] "Killer"
     - [ ] Greater Than
     - [ ] XV

@@ -28,23 +28,27 @@ func main() {
 		w = a.NewWindow("Number Place")
 	)
 
-	uiInit(w)
+	b := newBoard(3, 3, 3, 3)
+	b.load(wikipedia)
+
+	uiInit(b, w)
 
 	w.Show()
 	a.Run()
 }
 
-func uiInit(w fyne.Window) {
-	b := newBoard(3, 3, 3, 3)
-	b.load(wikipedia)
-
+func uiInit(b *board, w fyne.Window) {
 	controls := make([]fyne.CanvasObject, 0)
 
+	values := make(map[string]bool)
 	// TODO: Support other digit systems (such as HEX for sandwiche or Giant)
 	for i := 0; i < b.boxWidth*b.boxesWide; i++ {
 		v := strconv.Itoa(1 + i)
 		controls = append(controls, widget.NewButton(v, setSelected(b, v)))
+		values[v] = true
 	}
+
+	w.Canvas().SetOnTypedKey(keyHandler(b, values))
 
 	controlArea := container.NewVBox(
 		fyne.NewContainerWithLayout(
@@ -80,6 +84,43 @@ func uiInit(w fyne.Window) {
 
 	w.SetFixedSize(true)
 	w.CenterOnScreen()
+}
+
+func keyHandler(b *board, values map[string]bool) func(*fyne.KeyEvent) {
+	key := func(value string) {
+		if yes, ok := values[value]; !ok || !yes {
+			return
+		}
+
+		setSelected(b, value)()
+	}
+
+	return func(ke *fyne.KeyEvent) {
+		switch ke.Name {
+		case fyne.Key1:
+			key("1")
+		case fyne.Key2:
+			key("2")
+		case fyne.Key3:
+			key("3")
+		case fyne.Key4:
+			key("4")
+		case fyne.Key5:
+			key("5")
+		case fyne.Key6:
+			key("6")
+		case fyne.Key7:
+			key("7")
+		case fyne.Key8:
+			key("8")
+		case fyne.Key9:
+			key("9")
+		case fyne.KeyDelete:
+			clearSelected(b)()
+		case fyne.KeyBackspace:
+			clearSelected(b)()
+		}
+	}
 }
 
 func clearSelected(b *board) func() {
