@@ -47,32 +47,6 @@ func TestBoardUndo(t *testing.T) {
 	assert.EqualValues(t, cell.Center, old, "undo did not restore value")
 }
 
-func BenchmarkBoardLoad(b *testing.B) {
-	_ = test.NewApp()
-
-	board := newBoard(3, 3, 3, 3)
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		board.load(wikipedia)
-	}
-}
-
-func BenchmarkBoardCheck(b *testing.B) {
-	_ = test.NewApp()
-
-	board := newBoard(3, 3, 3, 3)
-
-	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sodoku")
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		board.check()
-	}
-}
-
 func BenchmarkBoardCheckSubgrids(b *testing.B) {
 	_ = test.NewApp()
 
@@ -81,7 +55,7 @@ func BenchmarkBoardCheckSubgrids(b *testing.B) {
 	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sodoku")
 
 	cb := func(cells []*cell) {
-		_ = cells
+		assert.Equal(b, len(cells), 0)
 	}
 
 	b.ReportAllocs()
@@ -99,7 +73,7 @@ func BenchmarkBoardCheckCols(b *testing.B) {
 	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sodoku")
 
 	cb := func(cells []*cell) {
-		_ = cells
+		assert.Equal(b, len(cells), 0)
 	}
 
 	b.ReportAllocs()
@@ -117,12 +91,38 @@ func BenchmarkBoardCheckRows(b *testing.B) {
 	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sodoku")
 
 	cb := func(cells []*cell) {
-		_ = cells
+		assert.Equal(b, len(cells), 0)
 	}
 
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		board.checkRowRepeat(cb)
+	}
+}
+
+func BenchmarkBoardCheck(b *testing.B) {
+	_ = test.NewApp()
+
+	board := newBoard(3, 3, 3, 3)
+
+	assert.NoError(b, board.load(wikipedia), "failed loading valid classic sodoku")
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		board.check()
+	}
+}
+
+func BenchmarkBoardLoad(b *testing.B) {
+	_ = test.NewApp()
+
+	board := newBoard(3, 3, 3, 3)
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		board.load(wikipedia)
 	}
 }
