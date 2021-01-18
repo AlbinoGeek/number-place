@@ -36,14 +36,14 @@ With Cells Selected:
 
 ### Puzzles Supported
 
-- [X] Sodoku
+- [X] Sudoku
   - [X] Standard Grid (9x9, 3x3 boxes)
     - [X] Classic
     - [ ] Quadratum latinum (uses roman numerals for values)
     - [ ] Alphabetical (uses a key of letters for values)
   - [ ] Mini Grid (6x6, 3x2 boxes)
   - [ ] Giant Grid (16x16, 4x4 boxes)
-- [ ] Constrainted-Based Gridded Sodoku:
+- [ ] Constrainted-Based Gridded Sudoku:
   - [ ] Standard Grid (9x9, 3x3 boxes)
     - [ ] "Killer"
     - [ ] Greater Than
