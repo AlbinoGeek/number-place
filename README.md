@@ -7,6 +7,8 @@
 [![GoReportCard](https://goreportcard.com/badge/github.com/AlbinoGeek/number-place)](https://goreportcard.com/report/github.com/AlbinoGeek/number-place)
 [![Coverage Status](https://coveralls.io/repos/github/AlbinoGeek/number-place/badge.svg?branch=develop)](https://coveralls.io/github/AlbinoGeek/number-place?branch=develop)
 
+[![](cmd/testdata/start.png)](cmd/testdata/start.png)
+
 ## Features
 
 Share puzzles simply by copying a string:
