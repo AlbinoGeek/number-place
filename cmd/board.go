@@ -27,6 +27,7 @@ type board struct {
 	mu      sync.Mutex
 	cells   []*cell
 	history []*state
+	initial *state
 
 	boxWidth  int
 	boxHeight int
@@ -52,6 +53,29 @@ func newBoard(boxWidth, boxHeight, boxesWide, boxesTall int) *board {
 
 	b.init()
 	return b
+}
+
+// UndoIndex is used by the undo function to determine the target state.
+type UndoIndex int
+
+var (
+	// InitialState will trigger undo to return the board to its' initial state,
+	// that is, what the board looked like after it was last loaded.
+	InitialState UndoIndex = -2
+
+	// RecentState will trigger undo to return the board before the last change
+	// had taken place. This is akin to a traditional undo feature.
+	RecentState UndoIndex = -1
+)
+
+func (b *board) Reset() {
+	if b.initial != nil {
+		b.undo(-2)
+	}
+}
+
+func (b *board) Undo() {
+	b.undo(RecentState)
 }
 
 // ! BADLY NAMED
@@ -330,6 +354,8 @@ func (b *board) load(in string) error {
 	b.mu.Unlock()
 
 	b.registerUndo()
+	b.initial = b.history[0]
+
 	return b.check()
 }
 
@@ -349,16 +375,26 @@ func (b *board) registerUndo() {
 	})
 }
 
-func (b *board) undo() {
+func (b *board) undo(idx UndoIndex) {
 	if len(b.history) == 0 {
 		return
 	}
 
 	b.mu.Lock()
 
-	n := len(b.history) - 1
-	s := b.history[n]
-	b.history = b.history[:n]
+	mod := int(idx)
+	if l := len(b.history); idx == RecentState || mod > l {
+		mod = l - 1
+	}
+
+	var s *state
+
+	if idx == InitialState {
+		s = b.initial
+	} else {
+		s = b.history[mod]
+		b.history = b.history[:mod]
+	}
 
 	jsoniter.Unmarshal(s.Data, &b.cells)
 	b.setMistakes(false)(b.cells)
