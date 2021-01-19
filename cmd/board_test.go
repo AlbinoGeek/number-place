@@ -26,6 +26,14 @@ func TestBoardLoadCheck(t *testing.T) {
 	assert.Errorf(t, board.load(testRowRepeat), "loading repeats in row should have failed")
 }
 
+func TestBoardInitExpand(t *testing.T) {
+	_ = test.NewApp()
+
+	board := newBoard(2, 2, 2, 2)
+
+	assert.NoError(t, board.load(wikipedia), "failed loading valid classic sudoku")
+}
+
 func TestBoardUndo(t *testing.T) {
 	_ = test.NewApp()
 
