@@ -69,7 +69,7 @@ func TestBoardUndo(t *testing.T) {
 		assert.EqualValues(t, v, board.cells[i].Center, "SetCenter failed to set expected value")
 	}
 
-	board.undo(InitialState)
+	board.Reset()
 	board.registerUndo()
 	assert.Equal(t, state, board.history[len(board.history)-1], "initial state undo did not work")
 }
