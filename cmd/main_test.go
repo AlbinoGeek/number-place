@@ -17,12 +17,14 @@ func TestUICells(t *testing.T) {
 		board = newBoard(3, 3, 3, 3)
 	)
 
-	assert.NoError(t, board.load(wikipedia), "failed loading valid classic sudoku")
-
 	uiInit(board, w)
 
 	w.Show()
 	a.Run()
+
+	test.AssertImageMatches(t, "start-empty.png", w.Canvas().Capture())
+
+	assert.NoError(t, board.load(wikipedia), "failed loading valid classic sudoku")
 
 	test.AssertImageMatches(t, "start.png", w.Canvas().Capture())
 
