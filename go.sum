@@ -1,7 +1,5 @@
-fyne.io/fyne v1.4.4-0.20210115013208-661d93b985d1 h1:SegLZ5pxIjnIVAVRZNvyHn7goP3rxijskTL/ih6UhlE=
-fyne.io/fyne v1.4.4-0.20210115013208-661d93b985d1/go.mod h1:8kiPBNSDmuplxs9WnKCkaWYqbcXFy0DeAzwa6PBO9Z8=
-fyne.io/fyne v1.4.4-0.20210118022800-7abf69095e4a h1:wK1a0nx85uqFwgG4KSv306Seky8cO1c703+Tbx3WDUQ=
-fyne.io/fyne v1.4.4-0.20210118022800-7abf69095e4a/go.mod h1:5NTy154sAtx0ftVW+L2/WykWdYtr8mYYKriBv9eD7Rk=
+fyne.io/fyne/v2 v2.0.0-rc5 h1:u2COctOQGSeXU03VhQL7tlFJTqPrahoN8iichvlZ7vA=
+fyne.io/fyne/v2 v2.0.0-rc5/go.mod h1:FmobqvPpBW+nG1nDyxZWf1SQLED9g/vXIxiIIVjHazY=
 github.com/Kodeworks/golang-image-ico v0.0.0-20141118225523-73f0f4cfade9/go.mod h1:7uhhqiBaR4CpN0k9rMjOtjpcfGd6DG2m04zQxKnWQ0I=
 github.com/akavel/rsrc v0.8.0/go.mod h1:uLoCtb9J+EyAqh+26kdrTgmzRBFPGOolLWKpdxkKq+c=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=

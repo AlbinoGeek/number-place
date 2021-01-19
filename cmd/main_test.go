@@ -5,24 +5,21 @@ import (
 	"strconv"
 	"testing"
 
-	"fyne.io/fyne/test"
+	"fyne.io/fyne/v2/test"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestUICells(t *testing.T) {
 	var (
-		a     = test.NewApp()
-		w     = a.NewWindow("Number Place")
-		board = newBoard(3, 3, 3, 3)
+		a        = test.NewApp()
+		board, w = start(a)
 	)
+	a.Run()
+
+	test.AssertImageMatches(t, "start-empty.png", w.Canvas().Capture())
 
 	assert.NoError(t, board.load(wikipedia), "failed loading valid classic sudoku")
-
-	uiInit(board, w)
-
-	w.Show()
-	a.Run()
 
 	test.AssertImageMatches(t, "start.png", w.Canvas().Capture())
 
@@ -49,5 +46,43 @@ func TestUICells(t *testing.T) {
 		c.Refresh()
 
 		test.AssertImageMatches(t, fmt.Sprintf("cell-center-%d.png", i), w.Canvas().Capture())
+	}
+}
+
+func TestUICellSelect(t *testing.T) {
+	var (
+		a        = test.NewApp()
+		board, w = start(a)
+
+		cells = []*cell{
+			board.cells[0],
+			board.cells[13],
+			board.cells[26],
+		}
+	)
+	a.Run()
+
+	// test setSelected
+	for _, c := range cells {
+		c.Select()
+	}
+
+	v := "1"
+	setSelected(board, v)()
+	test.AssertImageMatches(t, "some-set.png", w.Canvas().Capture())
+
+	for _, c := range cells {
+		assert.Equal(t, v, c.Center)
+		assert.Equal(t, false, c.mistake)
+		c.Select()
+	}
+
+	test.AssertImageMatches(t, "some-set-selected.png", w.Canvas().Capture())
+
+	// test clearSelected
+	clearSelected(board)()
+	v = ""
+	for _, c := range cells {
+		assert.Equal(t, v, c.Center)
 	}
 }

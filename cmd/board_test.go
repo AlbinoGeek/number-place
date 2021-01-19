@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"fyne.io/fyne/test"
+	"fyne.io/fyne/v2/test"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -24,6 +24,14 @@ func TestBoardLoadCheck(t *testing.T) {
 	assert.Errorf(t, board.load(testBoxRepeat), "loading repeats in boxes should have failed")
 	assert.Errorf(t, board.load(testColRepeat), "loading repeats in col should have failed")
 	assert.Errorf(t, board.load(testRowRepeat), "loading repeats in row should have failed")
+}
+
+func TestBoardInitExpand(t *testing.T) {
+	_ = test.NewApp()
+
+	board := newBoard(2, 2, 2, 2)
+
+	assert.NoError(t, board.load(wikipedia), "failed loading valid classic sudoku")
 }
 
 func TestBoardUndo(t *testing.T) {

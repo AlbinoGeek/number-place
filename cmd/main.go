@@ -3,13 +3,13 @@ package main
 import (
 	"strconv"
 
-	"fyne.io/fyne"
-	"fyne.io/fyne/app"
-	"fyne.io/fyne/container"
-	"fyne.io/fyne/dialog"
-	"fyne.io/fyne/layout"
-	"fyne.io/fyne/theme"
-	"fyne.io/fyne/widget"
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
+	"fyne.io/fyne/v2/widget"
 )
 
 //go:generate go run gen.go
@@ -23,18 +23,21 @@ var HighlightMistakes = true
 var wikipedia = `3,3,3,3,53-6---98-7-195----------6-8--4--7---6-8-3-2---3--1--6-6----------419-8-28---5-79`
 
 func main() {
-	var (
-		a = app.NewWithID("com.github.albinogeek.number-place")
-		w = a.NewWindow("Number Place")
-	)
-
-	b := newBoard(3, 3, 3, 3)
+	a := app.NewWithID("com.github.albinogeek.number-place")
+	b, _ := start(a)
 	b.load(wikipedia)
+	a.Run()
+}
+
+func start(a fyne.App) (*board, fyne.Window) {
+	w := a.NewWindow("Number Place")
+	b := newBoard(3, 3, 3, 3)
 
 	uiInit(b, w)
 
 	w.Show()
-	a.Run()
+
+	return b, w
 }
 
 func uiInit(b *board, w fyne.Window) {

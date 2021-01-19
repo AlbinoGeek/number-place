@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"fyne.io/fyne"
-	"fyne.io/fyne/layout"
-	"fyne.io/fyne/widget"
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/widget"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/kataras/golog"
 )
@@ -310,6 +310,10 @@ func (b *board) load(in string) error {
 		return fmt.Errorf("bad boxesTall should be integer")
 	}
 	b.boxesTall = p
+
+	b.cellsPerBox = b.boxWidth * b.boxHeight
+	b.cellsPerCol = b.boxHeight * b.boxesTall
+	b.cellsPerRow = b.boxWidth * b.boxesWide
 
 	b.init()
 
