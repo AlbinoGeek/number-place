@@ -23,18 +23,21 @@ var HighlightMistakes = true
 var wikipedia = `3,3,3,3,53-6---98-7-195----------6-8--4--7---6-8-3-2---3--1--6-6----------419-8-28---5-79`
 
 func main() {
-	var (
-		a = app.NewWithID("com.github.albinogeek.number-place")
-		w = a.NewWindow("Number Place")
-	)
-
-	b := newBoard(3, 3, 3, 3)
+	a := app.NewWithID("com.github.albinogeek.number-place")
+	b, _ := start(a)
 	b.load(wikipedia)
+	a.Run()
+}
+
+func start(a fyne.App) (*board, fyne.Window) {
+	w := a.NewWindow("Number Place")
+	b := newBoard(3, 3, 3, 3)
 
 	uiInit(b, w)
 
 	w.Show()
-	a.Run()
+
+	return b, w
 }
 
 func uiInit(b *board, w fyne.Window) {

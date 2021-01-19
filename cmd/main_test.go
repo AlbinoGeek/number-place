@@ -6,21 +6,15 @@ import (
 	"testing"
 
 	"fyne.io/fyne/v2/test"
-	"fyne.io/fyne/v2/theme"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestUICells(t *testing.T) {
 	var (
-		a     = test.NewApp()
-		w     = a.NewWindow("Number Place")
-		board = newBoard(3, 3, 3, 3)
+		a        = test.NewApp()
+		board, w = start(a)
 	)
-
-	uiInit(board, w)
-
-	w.Show()
 	a.Run()
 
 	test.AssertImageMatches(t, "start-empty.png", w.Canvas().Capture())
@@ -57,24 +51,16 @@ func TestUICells(t *testing.T) {
 
 func TestUICellSelect(t *testing.T) {
 	var (
-		a     = test.NewApp()
-		w     = a.NewWindow("Number Place")
-		board = newBoard(3, 3, 3, 3)
+		a        = test.NewApp()
+		board, w = start(a)
+
+		cells = []*cell{
+			board.cells[0],
+			board.cells[13],
+			board.cells[26],
+		}
 	)
-
-	uiInit(board, w)
-
-	w.Show()
 	a.Run()
-
-	fmt.Printf("%#v", theme.PrimaryColor())
-
-	cells := []*cell{
-		board.cells[0],
-		board.cells[13],
-		board.cells[26],
-		// board.cells[21],
-	}
 
 	// test setSelected
 	for _, c := range cells {
