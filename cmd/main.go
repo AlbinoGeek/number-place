@@ -62,7 +62,7 @@ func uiInit(b *board, w fyne.Window) {
 		fyne.NewContainerWithLayout(
 			layout.NewAdaptiveGridLayout(3),
 			widget.NewButtonWithIcon("", theme.CancelIcon(), clearSelected(b)),
-			widget.NewButtonWithIcon("", theme.ContentUndoIcon(), b.undo),
+			widget.NewButtonWithIcon("", theme.ContentUndoIcon(), b.Undo),
 			widget.NewButtonWithIcon("", theme.ConfirmIcon(), func() {
 				if err := b.check(); err != nil {
 					dialog.ShowError(err, w)
@@ -73,6 +73,8 @@ func uiInit(b *board, w fyne.Window) {
 					"I don't see any mistakes right now.\nIt's up to you to complete the puzzle.", w)
 			}),
 		),
+		widget.NewSeparator(),
+		widget.NewButtonWithIcon("", theme.DeleteIcon(), b.Reset),
 	)
 
 	w.SetContent(container.NewBorder(

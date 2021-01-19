@@ -1,6 +1,8 @@
 package main
 
 import (
+	"math/rand"
+	"strconv"
 	"testing"
 
 	"fyne.io/fyne/v2/test"
@@ -41,6 +43,9 @@ func TestBoardUndo(t *testing.T) {
 
 	assert.NoError(t, board.load(wikipedia), "failed loading valid classic sudoku")
 
+	board.registerUndo()
+	state := board.history[0]
+
 	cell := board.cells[2]
 	old := cell.Center
 
@@ -51,8 +56,22 @@ func TestBoardUndo(t *testing.T) {
 	assert.Errorf(t, board.check(), "checking repeats in boxes should have failed")
 	assert.EqualValues(t, cell.Center, "5", "SetCenter failed to set expected value")
 
-	board.undo()
+	board.Undo()
 	assert.EqualValues(t, cell.Center, old, "undo did not restore value")
+
+	// Set many values
+	for _, i := range []int{9, 18, 14, 27, 31, 2, 51, 60, 73} {
+		v := strconv.Itoa(rand.Intn(9))
+
+		board.registerUndo()
+		board.cells[i].SetCenter(v)
+
+		assert.EqualValues(t, v, board.cells[i].Center, "SetCenter failed to set expected value")
+	}
+
+	board.Reset()
+	board.registerUndo()
+	assert.Equal(t, state, board.history[len(board.history)-1], "initial state undo did not work")
 }
 
 func BenchmarkBoardCheckBoxes(b *testing.B) {
