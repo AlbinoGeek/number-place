@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"fyne.io/fyne"
-	"fyne.io/fyne/layout"
-	"fyne.io/fyne/widget"
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/widget"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/kataras/golog"
 )

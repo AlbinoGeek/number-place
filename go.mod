@@ -3,7 +3,7 @@ module github.com/AlbinoGeek/number-place
 go 1.15
 
 require (
-	fyne.io/fyne v1.4.4-0.20210118022800-7abf69095e4a
+	fyne.io/fyne/v2 v2.0.0-rc5
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20201108214237-06ea97f0c265 // indirect
 	github.com/json-iterator/go v1.1.10
 	github.com/kataras/golog v0.1.6
