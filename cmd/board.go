@@ -311,6 +311,10 @@ func (b *board) load(in string) error {
 	}
 	b.boxesTall = p
 
+	b.cellsPerBox = b.boxWidth * b.boxHeight
+	b.cellsPerCol = b.boxHeight * b.boxesTall
+	b.cellsPerRow = b.boxWidth * b.boxesWide
+
 	b.init()
 
 	if a, b := len(parts[4]), len(b.cells); a != b {
