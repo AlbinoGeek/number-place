@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"strconv"
 	"testing"
+	"time"
 
 	"fyne.io/fyne/v2/test"
 
@@ -15,6 +16,7 @@ var (
 	testBoxRepeat = `3,3,3,3,55-6---98-7-195----------6-8--4--7---6-8-3-2---3--1--6-6----------419-8-28---5-79`
 	testColRepeat = `3,3,3,3,53-6---98-7-195----------6-5--4--7---6-8-3-2---3--1--6-6----------419-8-28---5-79`
 	testRowRepeat = `3,3,3,3,53-6---9857-19-----------6-8--4--7---6-8-3-2---3--1--6-6----------419-8-28---5-79`
+	testEasySolve = `2,2,2,2,-234341223414123`
 )
 
 func TestBoardLoadCheck(t *testing.T) {
@@ -26,6 +28,33 @@ func TestBoardLoadCheck(t *testing.T) {
 	assert.Errorf(t, board.load(testBoxRepeat), "loading repeats in boxes should have failed")
 	assert.Errorf(t, board.load(testColRepeat), "loading repeats in col should have failed")
 	assert.Errorf(t, board.load(testRowRepeat), "loading repeats in row should have failed")
+}
+
+func TestBoardSolved(t *testing.T) {
+	_ = test.NewApp()
+
+	board := newBoard(2, 2, 2, 2)
+
+	assert.NoError(t, board.load(wikipedia), "failed loading valid classic sudoku")
+
+	assert.Equal(t, false, board.Solved(), "puzzle with blanks should not be solved")
+
+	assert.Errorf(t, board.load(testBoxRepeat), "loading repeats in boxes should have failed")
+
+	assert.Equal(t, false, board.Solved(), "invalid puzzle should not be solved")
+
+	assert.NoError(t, board.load(testEasySolve), "failed loading easy solve")
+
+	assert.Equal(t, false, board.Solved(), "easy solve should not be pre-solved")
+
+	// insure positive solve time
+	time.Sleep(time.Millisecond)
+
+	board.cells[0].SetCenter("1")
+
+	assert.Equal(t, true, board.Solved(), "easy solve should now be solved")
+
+	assert.Greater(t, board.timeFinish.UnixNano(), board.timeStart.UnixNano(), "finish time should be  positive")
 }
 
 func TestBoardInitExpand(t *testing.T) {
