@@ -157,10 +157,10 @@ func (b *board) checkColRepeat(duplicates checkerCallback) (err error) {
 		for col = 0; col < b.boxWidth; col++ {
 			i = 0
 			for by = 0; by < b.boxesTall; by++ {
-				offset = by * b.cellsPerBox * b.boxesWide //+ bx*b.cellsPerBox + col*b.boxWidth
+				offset = by*b.cellsPerBox*b.boxesWide + bx*b.cellsPerBox + col
 
 				for j = 0; j < b.boxHeight; j++ {
-					cellIDs[i] = offset + j*b.cellsPerCol
+					cellIDs[i] = offset + j*b.boxWidth
 					i++
 				}
 			}
