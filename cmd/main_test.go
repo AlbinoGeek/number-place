@@ -10,6 +10,30 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// This should be a perfectly valid (but not solvable) grid that looks like:
+//
+// ABC JKL
+// DEF MNO
+// GHI PQR
+var testBoardKey = `3,3,2,1,ABCDEFGHIJKLMNOPQR`
+
+func TestUIBoardKey(t *testing.T) {
+	var (
+		a        = test.NewApp()
+		board, w = start(a)
+	)
+	a.Run()
+
+	test.AssertImageMatches(t, "start-empty.png", w.Canvas().Capture())
+
+	assert.NoError(t, board.load(testBoardKey), "failed loading test board key")
+
+	v := board.Container
+	_ = v
+
+	test.AssertImageMatches(t, "board-key.png", w.Canvas().Capture())
+}
+
 func TestUICells(t *testing.T) {
 	var (
 		a        = test.NewApp()
