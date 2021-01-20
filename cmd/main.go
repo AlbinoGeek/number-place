@@ -53,7 +53,7 @@ func uiInit(b *board, w fyne.Window) {
 
 	w.Canvas().SetOnTypedKey(keyHandler(b, values))
 
-	controlArea := container.NewVBox(
+	controlArea := container.NewPadded(container.NewVBox(
 		fyne.NewContainerWithLayout(
 			layout.NewGridLayout(b.boxWidth),
 			controls...,
@@ -76,6 +76,7 @@ func uiInit(b *board, w fyne.Window) {
 		widget.NewSeparator(),
 		widget.NewButtonWithIcon("", theme.DeleteIcon(), b.Reset),
 	)
+	))
 
 	w.SetContent(container.NewBorder(
 		nil, nil, nil,
