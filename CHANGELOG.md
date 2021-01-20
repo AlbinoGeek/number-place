@@ -5,10 +5,10 @@
 **Added**
 
 - Button allows you to undo any value set.
-- Simple mistakes are highlighted as you play.
-- Button to check for mistakes.
-- Set/Clear values with alpha keys/numpad.
-- Button to reset puzzle to initial state.
+- Simple mistakes are highlighted as you play. (#4)
+- Button to check for mistakes. (#4)
+- Set/Clear values with alpha keys/numpad. (#5)
+- Button to reset puzzle to initial state. (#20)
 - New Game Timer shown in the bottom right, stops when puzzle solved. (#27)
 
 **Changed**
