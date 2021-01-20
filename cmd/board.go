@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	jsoniter "github.com/json-iterator/go"
@@ -23,6 +24,10 @@ type state struct {
 
 type board struct {
 	*fyne.Container `json:"-"`
+
+	solved     binding.Bool
+	timeStart  time.Time
+	timeFinish time.Time
 
 	mu      sync.Mutex
 	cells   []*cell
@@ -49,7 +54,21 @@ func newBoard(boxWidth, boxHeight, boxesWide, boxesTall int) *board {
 		cellsPerBox: boxWidth * boxHeight,
 		cellsPerCol: boxHeight * boxesTall,
 		cellsPerRow: boxWidth * boxesWide,
+		solved:      binding.NewBool(),
 	}
+
+	b.solved.AddListener(binding.NewDataListener(func() {
+		solved, _ := b.solved.Get()
+		b.mu.Lock()
+		for _, c := range b.cells {
+			if solved {
+				c.Disable()
+			} else {
+				c.Enable()
+			}
+		}
+		b.mu.Unlock()
+	}))
 
 	b.init()
 	return b
@@ -72,6 +91,26 @@ func (b *board) Reset() {
 	if b.initial != nil {
 		b.undo(-2)
 	}
+}
+
+func (b *board) Solved() bool {
+	if solved, _ := b.solved.Get(); solved {
+		return true
+	}
+
+	if b.check() != nil {
+		return false
+	}
+
+	for _, c := range b.cells {
+		if c.Given == "" && c.Center == "" {
+			return false
+		}
+	}
+
+	b.timeFinish = time.Now()
+	b.solved.Set(true)
+	return true
 }
 
 func (b *board) Undo() {
@@ -248,6 +287,9 @@ func (b *board) init() {
 	defer b.mu.Unlock()
 
 	b.history = make([]*state, 0)
+	b.timeStart = time.Now()
+
+	b.solved.Set(false)
 
 	var (
 		// TODO: support other cell arrangements, counts, in an elegant way
