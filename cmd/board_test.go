@@ -30,6 +30,25 @@ func TestBoardLoadCheck(t *testing.T) {
 	assert.Errorf(t, board.load(testRowRepeat), "loading repeats in row should have failed")
 }
 
+func TestBoardLoadInvalid(t *testing.T) {
+	_ = test.NewApp()
+
+	board := newBoard(3, 3, 3, 3)
+
+	for _, s := range []string{
+		"1,1,1,1,",
+		"foo",
+		",,,,",
+		"1,,foo,,",
+		"1,1,,,foo",
+		"1,1,1,,foo",
+	} {
+		assert.Error(t, board.load(s))
+	}
+
+	assert.NoError(t, board.load(`1,1,1,1,1`), "TECHNICALLY this should load")
+}
+
 func TestBoardSolved(t *testing.T) {
 	_ = test.NewApp()
 
