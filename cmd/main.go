@@ -47,7 +47,7 @@ func uiInit(b *board, w fyne.Window) {
 
 	values := make(map[string]bool)
 	// TODO: Support other digit systems (such as HEX for sandwiche or Giant)
-	for i := 0; i < b.boxWidth*b.boxesWide; i++ {
+	for i := 0; i < b.cellsPerRow; i++ {
 		v := strconv.Itoa(1 + i)
 		controls = append(controls, widget.NewButton(v, setSelected(b, v)))
 		values[v] = true
