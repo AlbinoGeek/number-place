@@ -55,12 +55,12 @@ func uiInit(b *board, w fyne.Window) {
 
 	controlArea := container.NewVBox(
 		fyne.NewContainerWithLayout(
-			layout.NewAdaptiveGridLayout(b.boxWidth),
+			layout.NewGridLayout(b.boxWidth),
 			controls...,
 		),
 		widget.NewSeparator(),
 		fyne.NewContainerWithLayout(
-			layout.NewAdaptiveGridLayout(3),
+			layout.NewGridLayout(3),
 			widget.NewButtonWithIcon("", theme.CancelIcon(), clearSelected(b)),
 			widget.NewButtonWithIcon("", theme.ContentUndoIcon(), b.Undo),
 			widget.NewButtonWithIcon("", theme.ConfirmIcon(), func() {

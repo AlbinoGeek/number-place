@@ -31,7 +31,7 @@ type cell struct {
 func newCell(id int) *cell {
 	// TODO: implement corner numbers
 	// c := fyne.NewContainerWithLayout(
-	// layout.NewAdaptiveGridLayout(3),
+	// layout.NewGridLayout(3),
 	// )
 
 	c := &cell{ID: id}

@@ -289,7 +289,7 @@ func (b *board) init() {
 			box.Refresh()
 		} else {
 			boxObjects[i] = widget.NewCard("", "", fyne.NewContainerWithLayout(
-				layout.NewAdaptiveGridLayout(b.boxWidth),
+				layout.NewGridLayout(b.boxWidth),
 				cells...,
 			))
 		}
@@ -301,7 +301,7 @@ func (b *board) init() {
 		b.Container.Refresh()
 	} else {
 		b.Container = fyne.NewContainerWithLayout(
-			layout.NewAdaptiveGridLayout(b.boxesWide),
+			layout.NewGridLayout(b.boxesWide),
 			boxObjects...,
 		)
 	}
