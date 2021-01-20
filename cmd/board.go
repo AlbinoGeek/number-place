@@ -123,7 +123,7 @@ func (b *board) setMistakes(v bool) func([]*cell) {
 // checkBoxRepeat checks the constraint : No value may be repeated within a box
 func (b *board) checkBoxRepeat(duplicates checkerCallback) (err error) {
 	var (
-		cellIDs = make([]int, b.cellsPerCol)
+		cellIDs = make([]int, b.cellsPerBox)
 		offset  int
 	)
 
@@ -157,10 +157,10 @@ func (b *board) checkColRepeat(duplicates checkerCallback) (err error) {
 		for col = 0; col < b.boxWidth; col++ {
 			i = 0
 			for by = 0; by < b.boxesTall; by++ {
-				offset = by * b.cellsPerBox * b.boxesWide //+ bx*b.cellsPerBox + col*b.boxWidth
+				offset = by*b.cellsPerBox*b.boxesWide + bx*b.cellsPerBox + col
 
 				for j = 0; j < b.boxHeight; j++ {
-					cellIDs[i] = offset + j*b.cellsPerRow
+					cellIDs[i] = offset + j*b.boxWidth
 					i++
 				}
 			}
@@ -289,7 +289,7 @@ func (b *board) init() {
 			box.Refresh()
 		} else {
 			boxObjects[i] = widget.NewCard("", "", fyne.NewContainerWithLayout(
-				layout.NewAdaptiveGridLayout(b.boxWidth),
+				layout.NewGridLayout(b.boxWidth),
 				cells...,
 			))
 		}
@@ -301,7 +301,7 @@ func (b *board) init() {
 		b.Container.Refresh()
 	} else {
 		b.Container = fyne.NewContainerWithLayout(
-			layout.NewAdaptiveGridLayout(b.boxesWide),
+			layout.NewGridLayout(b.boxesWide),
 			boxObjects...,
 		)
 	}
