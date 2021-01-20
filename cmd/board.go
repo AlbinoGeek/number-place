@@ -9,7 +9,10 @@ import (
 	"time"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
+	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/kataras/golog"
@@ -23,6 +26,12 @@ type state struct {
 
 type board struct {
 	*fyne.Container `json:"-"`
+	gameTimer       *canvas.Text
+	gameDuration    binding.String
+
+	solved     binding.Bool
+	timeStart  time.Time
+	timeFinish time.Time
 
 	mu      sync.Mutex
 	cells   []*cell
@@ -42,14 +51,56 @@ type board struct {
 
 func newBoard(boxWidth, boxHeight, boxesWide, boxesTall int) *board {
 	var b = &board{
-		boxWidth:    boxWidth,
-		boxHeight:   boxHeight,
-		boxesWide:   boxesWide,
-		boxesTall:   boxesTall,
-		cellsPerBox: boxWidth * boxHeight,
-		cellsPerCol: boxHeight * boxesTall,
-		cellsPerRow: boxWidth * boxesWide,
+		gameTimer:    canvas.NewText("", theme.ForegroundColor()),
+		gameDuration: binding.NewString(),
+		boxWidth:     boxWidth,
+		boxHeight:    boxHeight,
+		boxesWide:    boxesWide,
+		boxesTall:    boxesTall,
+		cellsPerBox:  boxWidth * boxHeight,
+		cellsPerCol:  boxHeight * boxesTall,
+		cellsPerRow:  boxWidth * boxesWide,
+		solved:       binding.NewBool(),
 	}
+
+	b.gameTimer.Hide()
+
+	timeFormat := func(t time.Duration) string {
+		return fmt.Sprintf("%.1fs", t.Seconds())
+	}
+
+	b.gameDuration.AddListener(binding.NewDataListener(func() {
+		last, _ := b.gameDuration.Get()
+		end := time.Now()
+		if b.timeFinish.UnixNano() > b.timeStart.UnixNano() {
+			end = b.timeFinish
+		}
+
+		// ! recursive data binding refresh, is this safe/sane?
+		// ? maybe this should be triggered by animation instead
+		go func() {
+			time.Sleep(time.Millisecond * 125)
+			if s := timeFormat(end.Sub(b.timeStart)); s != last {
+				b.gameTimer.Text = s
+				b.gameTimer.Refresh()
+
+				b.gameDuration.Set(s)
+			}
+		}()
+	}))
+
+	b.solved.AddListener(binding.NewDataListener(func() {
+		solved, _ := b.solved.Get()
+		b.mu.Lock()
+		for _, c := range b.cells {
+			if solved {
+				c.Disable()
+			} else {
+				c.Enable()
+			}
+		}
+		b.mu.Unlock()
+	}))
 
 	b.init()
 	return b
@@ -72,6 +123,26 @@ func (b *board) Reset() {
 	if b.initial != nil {
 		b.undo(-2)
 	}
+}
+
+func (b *board) Solved() bool {
+	if solved, _ := b.solved.Get(); solved {
+		return true
+	}
+
+	if b.check() != nil {
+		return false
+	}
+
+	for _, c := range b.cells {
+		if c.Given == "" && c.Center == "" {
+			return false
+		}
+	}
+
+	b.timeFinish = time.Now()
+	b.solved.Set(true)
+	return true
 }
 
 func (b *board) Undo() {
@@ -248,6 +319,9 @@ func (b *board) init() {
 	defer b.mu.Unlock()
 
 	b.history = make([]*state, 0)
+	b.timeStart = time.Now()
+
+	b.solved.Set(false)
 
 	var (
 		// TODO: support other cell arrangements, counts, in an elegant way

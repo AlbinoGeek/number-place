@@ -26,6 +26,8 @@ func main() {
 	a := app.NewWithID("com.github.albinogeek.number-place")
 	b, _ := start(a)
 	b.load(wikipedia)
+	b.gameTimer.Show()
+	b.gameTimer.Refresh()
 	a.Run()
 }
 
@@ -53,7 +55,7 @@ func uiInit(b *board, w fyne.Window) {
 
 	w.Canvas().SetOnTypedKey(keyHandler(b, values))
 
-	controlArea := container.NewVBox(
+	controlArea := container.NewPadded(container.NewVBox(
 		fyne.NewContainerWithLayout(
 			layout.NewGridLayout(b.boxWidth),
 			controls...,
@@ -75,7 +77,9 @@ func uiInit(b *board, w fyne.Window) {
 		),
 		widget.NewSeparator(),
 		widget.NewButtonWithIcon("", theme.DeleteIcon(), b.Reset),
-	)
+		layout.NewSpacer(),
+		container.NewHBox(b.gameTimer),
+	))
 
 	w.SetContent(container.NewBorder(
 		nil, nil, nil,

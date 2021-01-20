@@ -12,6 +12,7 @@ import (
 )
 
 var _ fyne.Widget = (*cell)(nil)
+var _ fyne.Disableable = (*cell)(nil)
 var _ desktop.Hoverable = (*cell)(nil)
 var _ desktop.Mouseable = (*cell)(nil)
 var _ mobile.Touchable = (*cell)(nil)
@@ -23,6 +24,7 @@ type cell struct {
 	Center string
 	Given  string
 
+	disabled bool
 	hovered  bool
 	mistake  bool
 	selected bool
@@ -44,7 +46,7 @@ func (c *cell) CreateRenderer() fyne.WidgetRenderer {
 	rend := &cellRenderer{
 		cell: c,
 		rect: canvas.NewRectangle(color.Transparent),
-		text: canvas.NewText(c.Center, theme.TextColor()),
+		text: canvas.NewText(c.Center, theme.ForegroundColor()),
 	}
 
 	rend.rect.StrokeWidth = 1
@@ -56,8 +58,22 @@ func (c *cell) CreateRenderer() fyne.WidgetRenderer {
 	return rend
 }
 
+func (c *cell) Disable() {
+	c.disabled = true
+	c.Refresh()
+}
+
+func (c *cell) Disabled() bool {
+	return c.disabled
+}
+
+func (c *cell) Enable() {
+	c.disabled = false
+	c.Refresh()
+}
+
 func (c *cell) MouseIn(evt *desktop.MouseEvent) {
-	if c.Given == "" {
+	if !c.Readonly() {
 		c.hovered = true
 
 		if evt.Button == desktop.LeftMouseButton && downCell != c {
@@ -72,7 +88,7 @@ func (c *cell) MouseIn(evt *desktop.MouseEvent) {
 }
 
 func (c *cell) MouseOut() {
-	if c.Given == "" {
+	if !c.Readonly() {
 		c.hovered = false
 		c.Refresh()
 	}
@@ -113,8 +129,12 @@ func (c *cell) TouchCancel(*mobile.TouchEvent) {}
 
 // ---
 
+func (c *cell) Readonly() bool {
+	return c.Given != "" || c.disabled
+}
+
 func (c *cell) Select() {
-	if c.Given == "" && !c.selected {
+	if !c.Readonly() && !c.selected {
 		c.selected = true
 		c.Refresh()
 	}
@@ -168,10 +188,13 @@ func (r *cellRenderer) Objects() []fyne.CanvasObject {
 }
 
 func (r *cellRenderer) Refresh() {
-	if r.cell.Given != "" {
-		// cell is known to be correct and cannot be modified
+	if r.cell.Readonly() {
 		r.rect.FillColor = theme.ShadowColor()
 		r.rect.StrokeColor = theme.HoverColor()
+	}
+
+	if r.cell.Given != "" {
+		// cell is known to be correct and cannot be modified
 		r.text.Text = r.cell.Given
 	} else {
 		// cell is unknown and can be selected and modified
