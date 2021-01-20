@@ -46,7 +46,7 @@ func (c *cell) CreateRenderer() fyne.WidgetRenderer {
 	rend := &cellRenderer{
 		cell: c,
 		rect: canvas.NewRectangle(color.Transparent),
-		text: canvas.NewText(c.Center, theme.TextColor()),
+		text: canvas.NewText(c.Center, theme.ForegroundColor()),
 	}
 
 	rend.rect.StrokeWidth = 1
