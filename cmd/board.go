@@ -123,7 +123,7 @@ func (b *board) setMistakes(v bool) func([]*cell) {
 // checkBoxRepeat checks the constraint : No value may be repeated within a box
 func (b *board) checkBoxRepeat(duplicates checkerCallback) (err error) {
 	var (
-		cellIDs = make([]int, b.cellsPerCol)
+		cellIDs = make([]int, b.cellsPerBox)
 		offset  int
 	)
 
@@ -160,7 +160,7 @@ func (b *board) checkColRepeat(duplicates checkerCallback) (err error) {
 				offset = by * b.cellsPerBox * b.boxesWide //+ bx*b.cellsPerBox + col*b.boxWidth
 
 				for j = 0; j < b.boxHeight; j++ {
-					cellIDs[i] = offset + j*b.cellsPerRow
+					cellIDs[i] = offset + j*b.cellsPerCol
 					i++
 				}
 			}
