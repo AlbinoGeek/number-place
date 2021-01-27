@@ -416,7 +416,7 @@ func (b *board) load(in string) error {
 	b.init()
 
 	if a, b := len(parts[4]), len(b.cells); a != b {
-		return fmt.Errorf("bad data has wrong cell count: expected %d, got %d", a, b)
+		return fmt.Errorf("bad data has wrong cell count: expected %d, got %d", b, a)
 	}
 
 	b.mu.Lock()
