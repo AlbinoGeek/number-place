@@ -193,17 +193,8 @@ func (b *board) setMistakes(v bool) func([]*cell) {
 
 // checkBoxRepeat checks the constraint : No value may be repeated within a box
 func (b *board) checkBoxRepeat(duplicates checkerCallback) (err error) {
-	var (
-		cellIDs = make([]int, b.cellsPerBox)
-		offset  int
-	)
-
 	for box := 0; box < b.boxesTall*b.boxesWide; box++ {
-		offset = b.cellsPerBox * box
-
-		for i := 0; i < b.cellsPerBox; i++ {
-			cellIDs[i] = offset + i
-		}
+		cellIDs := b.getBox(box)
 
 		if items := checkDuplicateIDs(b, cellIDs); len(items) > 0 {
 			err = fmt.Errorf("box %d contains duplicate values", 1+box)
