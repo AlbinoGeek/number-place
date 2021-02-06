@@ -20,7 +20,7 @@ import (
 // summary mistakes are checked for with every set.
 var HighlightMistakes = true
 
-var wikipedia = `3,3,3,3,53-6---98-7-195----------6-8--4--7---6-8-3-2---3--1--6-6----------419-8-28---5-79`
+var wikipedia = `3,3,3,3,53--7----6--195----98----6-8---6---34--8-3--17---2---6-6----28----419--5----8--79`
 
 func main() {
 	a := app.NewWithID("com.github.albinogeek.number-place")

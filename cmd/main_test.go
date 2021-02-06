@@ -12,9 +12,9 @@ import (
 
 // This should be a perfectly valid (but not solvable) grid that looks like:
 //
-// ABC JKL
-// DEF MNO
-// GHI PQR
+// ABC DEF
+// GHI JKL
+// MNO PQR
 var testBoardKey = `3,3,2,1,ABCDEFGHIJKLMNOPQR`
 
 func TestUIBoardKey(t *testing.T) {

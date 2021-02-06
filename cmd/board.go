@@ -193,17 +193,8 @@ func (b *board) setMistakes(v bool) func([]*cell) {
 
 // checkBoxRepeat checks the constraint : No value may be repeated within a box
 func (b *board) checkBoxRepeat(duplicates checkerCallback) (err error) {
-	var (
-		cellIDs = make([]int, b.cellsPerBox)
-		offset  int
-	)
-
 	for box := 0; box < b.boxesTall*b.boxesWide; box++ {
-		offset = b.cellsPerBox * box
-
-		for i := 0; i < b.cellsPerBox; i++ {
-			cellIDs[i] = offset + i
-		}
+		cellIDs := b.getBox(box)
 
 		if items := checkDuplicateIDs(b, cellIDs); len(items) > 0 {
 			err = fmt.Errorf("box %d contains duplicate values", 1+box)
@@ -221,27 +212,19 @@ func (b *board) checkColRepeat(duplicates checkerCallback) (err error) {
 	var (
 		cellIDs = make([]int, b.cellsPerCol)
 
-		bx, by, i, j, col, colNum, offset int
+		col, colNum int
 	)
 
-	for bx, colNum = 0, 0; bx < b.boxesWide; bx++ {
-		for col = 0; col < b.boxWidth; col++ {
-			i = 0
-			for by = 0; by < b.boxesTall; by++ {
-				offset = by*b.cellsPerBox*b.boxesWide + bx*b.cellsPerBox + col
+	for col = 0; col < b.cellsPerRow; col++ {
+		for i := 0; i < b.cellsPerCol; i++ {
+			cellIDs[i] = col + i*b.cellsPerCol
+		}
 
-				for j = 0; j < b.boxHeight; j++ {
-					cellIDs[i] = offset + j*b.boxWidth
-					i++
-				}
-			}
-
-			colNum++
-			if items := checkDuplicateIDs(b, cellIDs); len(items) > 0 {
-				err = fmt.Errorf("column %d contains duplicate values", colNum)
-				if duplicates != nil {
-					duplicates(items)
-				}
+		colNum++
+		if items := checkDuplicateIDs(b, cellIDs); len(items) > 0 {
+			err = fmt.Errorf("column %d contains duplicate values", colNum)
+			if duplicates != nil {
+				duplicates(items)
 			}
 		}
 	}
@@ -254,27 +237,20 @@ func (b *board) checkRowRepeat(duplicates checkerCallback) (err error) {
 	var (
 		cellIDs = make([]int, b.cellsPerRow)
 
-		bx, by, i, j, row, rowNum, offset int
+		row, rowNum, offset int
 	)
 
-	for by, rowNum = 0, 0; by < b.boxesTall; by++ {
-		for row = 0; row < b.boxHeight; row++ {
-			i = 0
-			for bx = 0; bx < b.boxesWide; bx++ {
-				offset = by*b.cellsPerBox*b.boxesWide + bx*b.cellsPerBox + row*b.boxWidth
+	for row = 0; row < b.cellsPerCol; row++ {
+		offset = b.cellsPerRow * row
+		for i := 0; i < b.cellsPerRow; i++ {
+			cellIDs[i] = offset + i
+		}
 
-				for j = 0; j < b.boxWidth; j++ {
-					cellIDs[i] = offset + j
-					i++
-				}
-			}
-
-			rowNum++
-			if items := checkDuplicateIDs(b, cellIDs); len(items) > 0 {
-				err = fmt.Errorf("row %d contains duplicate values", rowNum)
-				if duplicates != nil {
-					duplicates(items)
-				}
+		rowNum++
+		if items := checkDuplicateIDs(b, cellIDs); len(items) > 0 {
+			err = fmt.Errorf("row %d contains duplicate values", rowNum)
+			if duplicates != nil {
+				duplicates(items)
 			}
 		}
 	}
@@ -314,6 +290,24 @@ func checkDuplicateIDs(b *board, ids []int) []*cell {
 	return dupes
 }
 
+func (b *board) getBox(box int) (cells []int) {
+	cells = make([]int, b.cellsPerBox)
+
+	boxy := box / b.boxesWide
+	boxx := box - boxy*b.boxesWide
+	offset := boxy*b.cellsPerRow*b.boxHeight + boxx*b.boxWidth
+
+	for i, y := 0, 0; y < b.boxHeight; y++ {
+		for x := 0; x < b.boxWidth; x++ {
+			cells[i] = y*b.cellsPerRow + x + offset
+			i++
+		}
+	}
+
+
+	return
+}
+
 func (b *board) init() {
 	b.mu.Lock()
 	defer b.mu.Unlock()
@@ -345,15 +339,14 @@ func (b *board) init() {
 	}
 
 	b.cells = make([]*cell, b.cellsPerBox*numBoxes)
+	for i := range b.cells {
+		b.cells[i] = newCell(i)
+	}
 
-	n := 0
 	for i := 0; i < numBoxes; i++ {
 		cells := make([]fyne.CanvasObject, b.cellsPerBox)
-
-		for j := 0; j < b.cellsPerBox; j++ {
-			b.cells[n] = newCell(n)
-			cells[j] = b.cells[n]
-			n++
+		for j, k := range b.getBox(i) {
+			cells[j] = b.cells[k]
 		}
 
 		if boxObjects[i] != nil {
@@ -416,7 +409,7 @@ func (b *board) load(in string) error {
 	b.init()
 
 	if a, b := len(parts[4]), len(b.cells); a != b {
-		return fmt.Errorf("bad data has wrong cell count: expected %d, got %d", a, b)
+		return fmt.Errorf("bad data has wrong cell count: expected %d, got %d", b, a)
 	}
 
 	b.mu.Lock()
