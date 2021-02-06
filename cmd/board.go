@@ -314,6 +314,24 @@ func checkDuplicateIDs(b *board, ids []int) []*cell {
 	return dupes
 }
 
+func (b *board) getBox(box int) (cells []int) {
+	cells = make([]int, b.cellsPerBox)
+
+	boxy := box / b.boxesWide
+	boxx := box - boxy*b.boxesWide
+	offset := boxy*b.cellsPerRow*b.boxHeight + boxx*b.boxWidth
+
+	for i, y := 0, 0; y < b.boxHeight; y++ {
+		for x := 0; x < b.boxWidth; x++ {
+			cells[i] = y*b.cellsPerRow + x + offset
+			i++
+		}
+	}
+
+
+	return
+}
+
 func (b *board) init() {
 	b.mu.Lock()
 	defer b.mu.Unlock()

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"strconv"
 	"testing"
@@ -28,6 +29,38 @@ func TestBoardLoadCheck(t *testing.T) {
 	assert.Errorf(t, board.load(testBoxRepeat), "loading repeats in boxes should have failed")
 	assert.Errorf(t, board.load(testColRepeat), "loading repeats in col should have failed")
 	assert.Errorf(t, board.load(testRowRepeat), "loading repeats in row should have failed")
+}
+
+func TestBoardGetBox(t *testing.T) {
+	var (
+		a        = test.NewApp()
+		board, w = start(a)
+	)
+	a.Run()
+
+	for _, tc := range []struct {
+		box  int
+		data string
+	}{
+		{0, `3,3,3,3,123------456------789------------------------------------------------------------`},
+		{1, `3,3,3,3,---123------456------789---------------------------------------------------------`},
+		{2, `3,3,3,3,------123------456------789------------------------------------------------------`},
+		{3, `3,3,3,3,---------------------------123------456------789---------------------------------`},
+		{4, `3,3,3,3,------------------------------123------456------789------------------------------`},
+		{5, `3,3,3,3,---------------------------------123------456------789---------------------------`},
+		{6, `3,3,3,3,------------------------------------------------------123------456------789------`},
+		{7, `3,3,3,3,---------------------------------------------------------123------456------789---`},
+		{8, `3,3,3,3,------------------------------------------------------------123------456------789`},
+	} {
+		assert.NoError(t, board.load(tc.data))
+		for i, c := range board.getBox(tc.box) {
+			assert.Equal(t, strconv.Itoa(1+i), board.cells[c].Given)
+		}
+
+		test.AssertImageMatches(t,
+			fmt.Sprintf("board-get-box-%d.png", tc.box),
+			w.Canvas().Capture())
+	}
 }
 
 func TestBoardLoadInvalid(t *testing.T) {
