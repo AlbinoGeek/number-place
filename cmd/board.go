@@ -339,15 +339,14 @@ func (b *board) init() {
 	}
 
 	b.cells = make([]*cell, b.cellsPerBox*numBoxes)
+	for i := range b.cells {
+		b.cells[i] = newCell(i)
+	}
 
-	n := 0
 	for i := 0; i < numBoxes; i++ {
 		cells := make([]fyne.CanvasObject, b.cellsPerBox)
-
-		for j := 0; j < b.cellsPerBox; j++ {
-			b.cells[n] = newCell(n)
-			cells[j] = b.cells[n]
-			n++
+		for j, k := range b.getBox(i) {
+			cells[j] = b.cells[k]
 		}
 
 		if boxObjects[i] != nil {
