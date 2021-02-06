@@ -237,27 +237,20 @@ func (b *board) checkRowRepeat(duplicates checkerCallback) (err error) {
 	var (
 		cellIDs = make([]int, b.cellsPerRow)
 
-		bx, by, i, j, row, rowNum, offset int
+		row, rowNum, offset int
 	)
 
-	for by, rowNum = 0, 0; by < b.boxesTall; by++ {
-		for row = 0; row < b.boxHeight; row++ {
-			i = 0
-			for bx = 0; bx < b.boxesWide; bx++ {
-				offset = by*b.cellsPerBox*b.boxesWide + bx*b.cellsPerBox + row*b.boxWidth
+	for row = 0; row < b.cellsPerCol; row++ {
+		offset = b.cellsPerRow * row
+		for i := 0; i < b.cellsPerRow; i++ {
+			cellIDs[i] = offset + i
+		}
 
-				for j = 0; j < b.boxWidth; j++ {
-					cellIDs[i] = offset + j
-					i++
-				}
-			}
-
-			rowNum++
-			if items := checkDuplicateIDs(b, cellIDs); len(items) > 0 {
-				err = fmt.Errorf("row %d contains duplicate values", rowNum)
-				if duplicates != nil {
-					duplicates(items)
-				}
+		rowNum++
+		if items := checkDuplicateIDs(b, cellIDs); len(items) > 0 {
+			err = fmt.Errorf("row %d contains duplicate values", rowNum)
+			if duplicates != nil {
+				duplicates(items)
 			}
 		}
 	}
