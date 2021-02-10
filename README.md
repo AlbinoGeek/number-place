@@ -5,18 +5,47 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/be0523753694eee85927/maintainability)](https://codeclimate.com/github/AlbinoGeek/number-place/maintainability)  
 [![CI](https://github.com/AlbinoGeek/number-place/workflows/CI/badge.svg?branch=main)](#)
 [![GoReportCard](https://goreportcard.com/badge/github.com/AlbinoGeek/number-place)](https://goreportcard.com/report/github.com/AlbinoGeek/number-place)
+[![Coverage Status](https://coveralls.io/repos/github/AlbinoGeek/number-place/badge.svg?branch=develop)](https://coveralls.io/github/AlbinoGeek/number-place?branch=develop)
+
+[![](cmd/testdata/start.png)](cmd/testdata/start.png)
 
 ## Features
 
+Share puzzles simply by copying a string:
+
+```
+3,3,3,3,53-6---98-7-195----------6-8--4--7---6-8-3-2---3--1--6-6----------419-8-28---5-79
+```
+
+Cells:
+
+- Click/Tap Toggle Select
+- Drag to Select Multiple
+- Unlimited Undo Levels
+
+Help:
+
+- Highlights Simple Mistakes
+
+### Keyboard Controls
+
+With Cells Selected:
+
+- Use the alpha keys or numpad to set the center value
+- Use the `del`ete or `backspace` keys to clear all values
+
 ### Puzzles Supported
 
-- [ ] Sodoku
-  - [ ] Standard Grid (9x9, 3x3 subgrids)
-    - [ ] Classic
-  - [ ] Mini Grid (6x6, 3x2 subgrids)
-  - [ ] Giant Grid (16x16, 4x4 subgrids)
-- [ ] Constrainted-Based Gridded Sodoku:
-  - [ ] Standard Grid (9x9, 3x3 subgrids)
+- [X] Sudoku
+  - [X] Standard Grid (9x9, 3x3 boxes)
+    - [X] Classic
+    - [ ] Quadratum latinum (uses roman numerals for values)
+    - [ ] Alphabetical (uses a key of letters for values)
+  - [ ] Mini Grid (6x6, 3x2 boxes)
+  - [ ] Giant Grid (16x16, 4x4 boxes)
+- [ ] Constrainted-Based Gridded Sudoku:
+  - [ ] Standard Grid (9x9, 3x3 boxes)
+    - [ ] "Killer"
     - [ ] Greater Than
     - [ ] XV
 

@@ -38,7 +38,7 @@ func getCommitSHA() string {
 
 func getPackageName() string {
 	_, b, _, _ := runtime.Caller(0)
-	return filepath.Base(filepath.Dir(b))
+	return filepath.Base(filepath.Dir(filepath.Join(b, "..")))
 }
 
 func getVersion() string {

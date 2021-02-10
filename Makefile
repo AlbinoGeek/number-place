@@ -2,7 +2,7 @@ MAKE                = make --no-print-directory
 
 FYNE_CROSS          = $(shell go env | awk -F'"' '/GOPATH/ {print $$2}')/bin/fyne-cross
 
-DESCRIBE           := $(shell go run gen.go VERSION)
+DESCRIBE           := $(shell go run cmd/gen.go VERSION)
 DESCRIBE_PARTS     := $(subst -, ,$(DESCRIBE))
 
 VERSION_TAG        := $(word 1,$(DESCRIBE_PARTS))
@@ -19,8 +19,8 @@ NEXT_MAJOR         := $(shell echo $$(($(MAJOR)+1)))
 NEXT_MINOR         := $(shell echo $$(($(MINOR)+1)))
 NEXT_MICRO          = $(shell echo $$(($(MICRO)+$(COMMITS_SINCE_TAG))))
 
-BINARYNAME          = $(shell go run gen.go PROGRAM)
-MODNAME             = github.com/AlbinoGeek/$(BINARYNAME)
+BINARYNAME          = $(shell go run cmd/gen.go PROGRAM)
+MODNAME             = github.com/AlbinoGeek/$(BINARYNAME)/cmd
 APP_NAME            = com.github.albinogeek.$(BINARYNAME)
 TARGETDIR           = _dist
 
